@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entreprise de Nettoyage à Toulouse – CleanOcc</title>
+
+  <!-- SEO -->
+  <meta name="description"
+    content="CleanOcc, entreprise de nettoyage à Toulouse et alentours (15–20 km) : lavage de vitres, nettoyage de bureaux et locaux professionnels, fin de location et fin de chantier. Plus de 20 clients satisfaits, note moyenne 4,6/5. Devis rapide et gratuit." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://cleanocc.net/" />
+  <!-- Si le site est servi ailleurs que sur le même serveur que l’API, indiquez l’origine (ex. http://localhost:3000) -->
+  <meta name="cleanocc-api-origin" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f5f7fb;
+      --bg-soft: #ffffff;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --primary-dark: #1d4ed8;
+      --accent: #22c55e;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.10);
+      --radius-lg: 18px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #e0f2fe, #f5f7fb 40%, #eef2ff 100%);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* NAVBAR */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(248, 250, 252, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 7vw;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-size: 1.05rem;
+      color: #0f172a;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 0%, #38bdf8, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #eff6ff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+    }
+
+    .logo-sub {
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .nav-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(226, 232, 240, 0.7);
+      color: var(--text);
+    }
+
+    .nav-phone span {
+      font-weight: 600;
+    }
+
+    .btn-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px 7vw 64px;
+    }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 72px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(129, 140, 248, 0.4);
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 18px;
+    }
+
+    .hero-badge span {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.35);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 3.6vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.05em;
+      margin-bottom: 16px;
+      color: #020617;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--primary);
+    }
+
+    .hero-sub {
+      font-size: 0.98rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 24px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .hero-meta strong {
+      color: #0f172a;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #eff6ff;
+      padding: 13px 26px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.40);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #fff;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: #0f172a;
+    }
+
+    .btn-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #16a34a;
+    }
+
+    .btn-whatsapp span {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #22c55e;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ecfdf5;
+      font-size: 0.8rem;
+    }
+
+    .hero-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .hero-card {
+      background: rgba(248, 250, 252, 0.95);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    .hero-card-main {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hero-card-main span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #16a34a;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #dcfce7;
+    }
+
+    .hero-card-list {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .hero-card-list li {
+      list-style: none;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .hero-card-list li b {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .hero-card-rating {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-top: 1px dashed rgba(148, 163, 184, 0.45);
+      padding-top: 8px;
+      margin-top: 6px;
+    }
+
+    .hero-card-stars {
+      color: #f97316;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* SECTIONS GÉNÉRIQUES */
+    section {
+      margin-bottom: 72px;
+    }
+
+    .section-header {
+      margin-bottom: 26px;
+    }
+
+    .section-eyebrow {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #2563eb;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+      color: #020617;
+    }
+
+    .section-sub {
+      font-size: 0.94rem;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    /* SERVICES */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+    }
+
+    .service-card {
+      background: var(--bg-soft);
+      border-radius: 16px;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .service-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .service-card h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .service-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .service-tagline {
+      font-size: 0.8rem;
+      color: #0f172a;
+      font-weight: 500;
+    }
+
+    /* ZONES */
+    .zones {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 30px;
+      align-items: start;
+    }
+
+    .zones-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .zones-pill {
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: #f8fafc;
+    }
+
+    .zones-card {
+      background: #0f172a;
+      border-radius: 18px;
+      color: #e5e7eb;
+      padding: 16px 18px 14px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+    }
+
+    .zones-card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .zones-card p {
+      font-size: 0.86rem;
+      color: #cbd5f5;
+      margin-bottom: 8px;
+    }
+
+    .zones-card span {
+      font-size: 0.8rem;
+      color: #a5b4fc;
+    }
+
+    /* PROCESS */
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .process-step {
+      background: var(--bg-soft);
+      border-radius: 14px;
+      padding: 14px 14px 13px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+    }
+
+    .process-step-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .step-index {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .process-step h3 {
+      font-size: 0.9rem;
+    }
+
+    .process-step p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* CONTACT */
+    .contact {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .contact-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .contact-card h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .contact-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+      font-size: 0.85rem;
+    }
+
+    .form-full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: #0f172a;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5f5;
+      font-family: inherit;
+      font-size: 0.86rem;
+      background: #f9fafb;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .form-helper {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .form-status {
+      display: none;
+      font-size: 0.86rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+
+    .form-status.is-visible {
+      display: block;
+    }
+
+    .form-status--success {
+      background: #ecfdf5;
+      border: 1px solid #86efac;
+      color: #14532d;
+    }
+
+    .form-status--error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .contact-infos {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .contact-row {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .contact-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(248, 250, 252, 0.9);
+      font-size: 0.84rem;
+    }
+
+    /* AVIS */
+    .proof-section {
+      margin-top: 20px;
+    }
+
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .testimonial {
+      background: var(--bg-soft);
+      border-radius: 16px;
+      padding: 16px 16px 14px;
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      font-size: 0.88rem;
+      color: var(--muted);
+      position: relative;
+    }
+
+    .testimonial::before {
+      content: "“";
+      position: absolute;
+      top: 4px;
+      right: 14px;
+      font-size: 2.8rem;
+      color: rgba(148, 163, 184, 0.35);
+      line-height: 1;
+    }
+
+    .stars {
+      color: #f97316;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .testimonial-author {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .testimonial-city {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .rating-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .rating-score {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .rating-score strong {
+      font-size: 1.3rem;
+      color: #0f172a;
+    }
+
+    .rating-chip {
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: #16a34a;
+      font-weight: 600;
+    }
+
+    /* ENCART AVIS GOOGLE */
+    .google-review-encart {
+      margin-top: 22px;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(203, 213, 225, 0.95);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      padding: 18px 20px;
+    }
+
+    .google-review-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px 22px;
+      justify-content: space-between;
+    }
+
+    .google-review-lead {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      min-width: min(100%, 280px);
+      flex: 1 1 260px;
+    }
+
+    .google-review-g {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .google-review-g svg {
+      width: 26px;
+      height: 26px;
+      display: block;
+    }
+
+    .google-review-encart h3 {
+      font-size: 1.02rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+      color: #020617;
+    }
+
+    .google-review-encart p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 460px;
+    }
+
+    .google-review-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-shrink: 0;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1a1a1a;
+      background: #fff;
+      border: 1px solid rgba(203, 213, 225, 0.95);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .google-review-btn:hover {
+      border-color: rgba(148, 163, 184, 0.85);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .google-review-btn:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .google-review-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .google-review-btn {
+        width: 100%;
+      }
+    }
+
+    /* FAQ */
+    .faq {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      padding: 8px 0;
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .faq-q {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
+    .faq-q::after {
+      content: '+';
+      font-size: 1rem;
+      color: #4f46e5;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-q::after {
+      content: '−';
+    }
+
+    .faq-a {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .faq-item.open .faq-a {
+      display: block;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(203, 213, 225, 0.9);
+      padding: 18px 7vw 26px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      background: rgba(248, 250, 252, 0.96);
+      margin-top: 20px;
+    }
+
+    @media (max-width: 900px) {
+
+      .hero,
+      .zones,
+      .contact {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        margin-bottom: 56px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      nav {
+        padding-inline: 18px;
+      }
+
+      main {
+        padding: 32px 18px 50px;
+      }
+
+      .hero-cta-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-phone {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">
+      <div class="logo-mark">C</div>
+      <div>
+        CleanOcc
+        <div class="logo-sub">Entreprise de nettoyage à Toulouse</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a href="tel:+33768140560" class="nav-phone">
+        <span>07 68 14 05 60</span>
+      </a>
+      <a href="#contact" class="btn-nav">Demander un devis</a>
+    </div>
+  </nav>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-badge"><span></span>Entreprise de nettoyage à Toulouse & alentours</div>
+        <h1>Nettoyage professionnel à <em>Toulouse</em> et 20 km autour.</h1>
+        <p class="hero-sub">
+          Lavage de vitres, nettoyage de bureaux et locaux professionnels, fin de location et fin de chantier.
+          Service réactif, soigné et discret pour particuliers et entreprises.
+        </p>
+        <div class="hero-meta">
+          <div><strong>20+ clients accompagnés</strong> à Toulouse & environs</div>
+          <div><strong>Note moyenne 4,6/5</strong> – la plupart de nos clients sont satisfaits</div>
+        </div>
+        <div class="hero-cta-group">
+          <a href="#contact" class="btn-primary">Demander un devis gratuit</a>
+          <a href="tel:+33768140560" class="btn-secondary">Appeler – 07 68 14 05 60</a>
+          <a href="https://wa.me/33768140560?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20un%20nettoyage%20%C3%A0%20Toulouse."
+            target="_blank" class="btn-whatsapp">
+            <span>W</span> Écrire sur WhatsApp
+          </a>
+        </div>
+        <p class="hero-note">Réponse rapide (souvent dans la journée) – intervention à Toulouse et jusqu’à 15–20 km.</p>
+      </div>
+      <aside class="hero-card" aria-label="Résumé des avantages CleanOcc">
+        <div class="hero-card-label">Pourquoi choisir CleanOcc ?</div>
+        <div class="hero-card-main">
+          <div>Un seul interlocuteur pour tous vos besoins de nettoyage.</div>
+          <span>Note moyenne 4,6/5</span>
+        </div>
+        <ul class="hero-card-list">
+          <li><b>Nettoyage minutieux</b> des vitres, sols, surfaces, sanitaires, cuisines et zones de passage.</li>
+          <li><b>Adapté aux pros</b> : bureaux, cabinets, commerces, locaux professionnels.</li>
+          <li><b>Fin de location / fin de chantier</b> : remise en état complète pour état des lieux ou livraison.</li>
+        </ul>
+        <div class="hero-card-rating">
+          <div class="hero-card-stars">★★★★★ 4,5/5</div>
+          <div>Déjà 17 avis clients à Toulouse et alentours.</div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services">
+      <header class="section-header">
+        <div class="section-eyebrow">Nos services de nettoyage</div>
+        <h2>Lavage de vitres, bureaux, fin de location et fin de chantier.</h2>
+        <p class="section-sub">
+          Des prestations de nettoyage complètes, adaptées à vos besoins, que vous soyez particulier ou professionnel.
+        </p>
+      </header>
+      <div class="services-grid">
+        <article class="service-card">
+          <div class="service-icon">🪟</div>
+          <h3>Lavage de vitres</h3>
+          <p>Vitrines de commerces, fenêtres d’appartements, baies vitrées, vérandas… Intérieur et extérieur lorsque
+            l’accès le permet.</p>
+          <div class="service-tagline">Résultat sans traces pour une lumière maximale.</div>
+        </article>
+        <article class="service-card">
+          <div class="service-icon">🏢</div>
+          <h3>Nettoyage de bureaux & locaux professionnels</h3>
+          <p>Dépoussiérage, sols, sanitaires, kitchenette, poubelles, poignées et zones de contact. Possibilité
+            d’intervenir en horaires décalés.</p>
+          <div class="service-tagline">Un environnement propre pour vos équipes et vos clients.</div>
+        </article>
+        <article class="service-card">
+          <div class="service-icon">📦</div>
+          <h3>Nettoyage de fin de location</h3>
+          <p>Remise en état complète du logement pour l’état des lieux : cuisine, salle de bain, sols, plinthes, vitres
+            et éléments oubliés.</p>
+          <div class="service-tagline">Pour rendre un logement impeccable au propriétaire ou au nouveau locataire.</div>
+        </article>
+        <article class="service-card">
+          <div class="service-icon">🚧</div>
+          <h3>Nettoyage de fin de chantier</h3>
+          <p>Évacuation des poussières, traces de peinture, résidus de travaux et nettoyage des vitres après rénovation
+            ou construction.</p>
+          <div class="service-tagline">Pour livrer un chantier propre et prêt à être utilisé.</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ZONES -->
+    <section id="zones">
+      <header class="section-header">
+        <div class="section-eyebrow">Zones d’intervention</div>
+        <h2>Nettoyage à Toulouse et 15–20 km autour.</h2>
+        <p class="section-sub">
+          Basé à Toulouse, nous intervenons dans les communes voisines pour des prestations ponctuelles ou régulières.
+        </p>
+      </header>
+      <div class="zones">
+        <div>
+          <p style="font-size:0.92rem;color:var(--muted);">
+            Nous nous déplaçons principalement à Toulouse et dans un rayon d’environ 15 à 20 km.
+            Lors de votre demande de devis, indiquez simplement l’adresse d’intervention pour une réponse précise et
+            rapide.
+          </p>
+          <div class="zones-list" aria-label="Exemples de villes desservies">
+            <div class="zones-pill">Toulouse</div>
+            <div class="zones-pill">Blagnac</div>
+            <div class="zones-pill">Castelginest</div>
+            <div class="zones-pill">Colomiers</div>
+            <div class="zones-pill">L’Union</div>
+            <div class="zones-pill">Balma</div>
+            <div class="zones-pill">Aucamville</div>
+            <div class="zones-pill">Et alentours…</div>
+          </div>
+        </div>
+        <aside class="zones-card">
+          <h3>Intervention rapide autour de Toulouse</h3>
+          <p>Idéal pour les entreprises et particuliers qui recherchent un prestataire réactif, pour un besoin ponctuel
+            ou un entretien régulier.</p>
+          <span>Lors de votre message, précisez : type de prestation, surface approximative et ville
+            d’intervention.</span>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section id="process">
+      <header class="section-header">
+        <div class="section-eyebrow">Comment ça se passe ?</div>
+        <h2>Un processus simple pour un résultat propre et net.</h2>
+        <p class="section-sub">
+          L’objectif : vous simplifier la vie. Vous expliquez votre besoin, nous nous occupons du reste.
+        </p>
+      </header>
+      <div class="process-grid">
+        <article class="process-step">
+          <div class="process-step-head">
+            <div class="step-index">1</div>
+            <h3>Prise de contact & devis</h3>
+          </div>
+          <p>Vous décrivez votre besoin (type de prestation, surface, fréquence). Nous vous répondons rapidement avec un
+            devis clair.</p>
+        </article>
+        <article class="process-step">
+          <div class="process-step-head">
+            <div class="step-index">2</div>
+            <h3>Planification de l’intervention</h3>
+          </div>
+          <p>Nous convenons ensemble de la date et de l’horaire : en journée ou en horaires décalés pour les
+            professionnels.</p>
+        </article>
+        <article class="process-step">
+          <div class="process-step-head">
+            <div class="step-index">3</div>
+            <h3>Nettoyage complet</h3>
+          </div>
+          <p>Nous réalisons la prestation prévue avec minutie, en respectant vos consignes et la tranquillité des lieux.
+          </p>
+        </article>
+        <article class="process-step">
+          <div class="process-step-head">
+            <div class="step-index">4</div>
+            <h3>Contrôle & satisfaction</h3>
+          </div>
+          <p>Nous faisons un tour ensemble à la fin. Votre retour est pris en compte pour les prochaines interventions.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <header class="section-header">
+        <div class="section-eyebrow">Demande de devis</div>
+        <h2>Expliquez votre besoin, nous revenons vers vous rapidement.</h2>
+        <p class="section-sub">
+          Remplissez ce formulaire ou contactez-nous directement par téléphone ou WhatsApp pour un devis personnalisé.
+        </p>
+      </header>
+      <div class="contact">
+        <div class="contact-card">
+          <h3>Formulaire de contact</h3>
+          <p>Quelques informations suffisent pour vous donner un premier retour sur le prix et la disponibilité.</p>
+          <form id="devis-form" method="post" action="/api/devis">
+            <div>
+              <label for="name">Nom complet *</label>
+              <input type="text" id="name" name="name" placeholder="Nom et prénom" required />
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="exemple@domaine.com" />
+            </div>
+            <div>
+              <label for="phone">Téléphone *</label>
+              <input type="tel" id="phone" name="phone" placeholder="06 XX XX XX XX" required />
+            </div>
+            <div>
+              <label for="city">Ville d’intervention *</label>
+              <input type="text" id="city" name="city" placeholder="Toulouse, Blagnac, Castelginest…" required />
+            </div>
+            <div>
+              <label for="service">Type de prestation *</label>
+              <select id="service" name="service" required>
+                <option value="">Sélectionnez un service</option>
+                <option value="vitres">Lavage de vitres</option>
+                <option value="bureaux">Nettoyage de bureaux / locaux professionnels</option>
+                <option value="fin-location">Nettoyage de fin de location</option>
+                <option value="fin-chantier">Nettoyage de fin de chantier</option>
+                <option value="autre">Autre demande de nettoyage</option>
+              </select>
+            </div>
+            <div class="form-full">
+              <label for="message">Précisions sur votre demande *</label>
+              <textarea id="message" name="message"
+                placeholder="Surface approximative, fréquence souhaitée, particularités du lieu…" required></textarea>
+            </div>
+            <div class="form-full form-actions">
+              <button type="submit" class="btn-primary" style="border:none;cursor:pointer;">Envoyer ma demande de
+                devis</button>
+              <div class="form-helper">Réponse en général sous 24h (hors week-end).</div>
+            </div>
+            <div id="devis-form-status" class="form-status form-full" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+        <div class="contact-infos">
+          <strong>Contact direct</strong>
+          <div class="contact-row">
+            <a href="tel:+33768140560" class="contact-chip">📞 07 68 14 05 60</a>
+            <a href="mailto:contact@cleanocc.net" class="contact-chip">✉️ contact@cleanocc.net</a>
+            <a href="https://wa.me/33768140560?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20un%20nettoyage%20%C3%A0%20Toulouse."
+              target="_blank" class="contact-chip">💬 WhatsApp – message direct</a>
+          </div>
+          <p style="margin-top:12px;">
+            Nous travaillons avec des particuliers, des petites entreprises, des cabinets (comptables, médicaux,
+            paramédicaux…),
+            des commerces et des propriétaires/bailleurs pour la remise en état des logements.
+          </p>
+          <p style="margin-top:8px;">
+            Chaque intervention est réalisée avec soin, produits adaptés et respect des lieux. L’objectif est simple :
+            que vous soyez serein(e) en nous confiant vos besoins de nettoyage.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- AVIS CLIENTS -->
+    <section class="proof-section" id="temoignages">
+      <div class="section-header">
+        <div class="section-eyebrow">Avis clients</div>
+        <h2>Entreprise de nettoyage à Toulouse recommandée.</h2>
+        <p class="section-sub">
+          Déjà 17 avis clients, noté 4,5/5 à Toulouse et ses environs – la plupart de nos clients sont satisfaits de nos
+          services de nettoyage.
+        </p>
+      </div>
+      <div class="rating-summary">
+        <div class="rating-score">
+          <strong>4,5/5</strong>
+          <span>sur 17 avis</span>
+        </div>
+        <div class="rating-chip">Entreprise de nettoyage à Toulouse</div>
+      </div>
+      <div class="testimonials">
+        <article class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>Fin de bail parfaitement réalisée, l’appartement était impeccable pour l’état des lieux. Très ponctuel,
+            professionnel et soigneux. Idéal pour un déménagement sans stress.</p>
+          <div class="testimonial-author">Client fin de location</div>
+          <div class="testimonial-city">Toulouse & alentours</div>
+        </article>
+        <article class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p>Nous faisons appel à CleanOcc pour l’entretien régulier de nos bureaux. Travail sérieux, résultat propre à
+            chaque passage et très bonne communication. Tarifs clairs et sans surprise.</p>
+          <div class="testimonial-author">Responsable de bureaux</div>
+          <div class="testimonial-city">Toulouse</div>
+        </article>
+        <article class="testimonial">
+          <div class="stars">★★★★☆</div>
+          <p>Suite à des travaux, le nettoyage de fin de chantier a été fait rapidement. Les sols et les vitres étaient
+            nickel, toutes les poussières ont été enlevées. Nous referons appel à CleanOcc si besoin.</p>
+          <div class="testimonial-author">Client fin de chantier</div>
+          <div class="testimonial-city">Toulouse & environs</div>
+        </article>
+      </div>
+
+      <div class="google-review-encart" id="avis-google">
+        <div class="google-review-inner">
+          <div class="google-review-lead">
+            <div class="google-review-g" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Google">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.86 11.86 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+              </svg>
+            </div>
+            <div>
+              <h3>Vous souhaitez laisser un avis&nbsp;?</h3>
+              <p>
+                Si vous avez été satisfait de notre prestation, un avis sur Google aide d’autres habitants et entreprises
+                de Toulouse et des environs à nous faire confiance.
+              </p>
+            </div>
+          </div>
+          <a class="google-review-btn"
+            href="https://g.page/r/Ccu-SNMo8O5XEBM/review"
+            target="_blank" rel="noopener noreferrer">
+            Rédiger un avis Google
+          </a>
+        </div>
+      </div>
+
+      <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">
+        Synthèse d’avis clients inspirés des retours CleanOcc – entreprise de nettoyage à Toulouse et ses environs.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section aria-label="Questions fréquentes">
+      <div class="faq">
+        <div class="section-header" style="margin-bottom:10px;">
+          <div class="section-eyebrow">Questions fréquentes</div>
+          <h2>FAQ – Nettoyage à Toulouse.</h2>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Travaillez-vous avec les particuliers, les professionnels, ou les deux ?</div>
+          <div class="faq-a">Nous travaillons aussi bien avec les particuliers (maisons, appartements, fin de location)
+            qu’avec les professionnels (bureaux, cabinets, commerces, locaux professionnels). Le devis est adapté à
+            votre situation.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Pouvez-vous intervenir rapidement pour une fin de location ou un chantier ?</div>
+          <div class="faq-a">Oui, dans la mesure des disponibilités, nous pouvons intervenir rapidement pour une remise
+            en état avant un état des lieux ou une livraison de chantier. Le mieux est de nous contacter par téléphone
+            ou WhatsApp pour voir ensemble la date exacte.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Fournissez-vous les produits et le matériel de nettoyage ?</div>
+          <div class="faq-a">Oui, nous pouvons fournir tout le matériel nécessaire (aspirateur, serpillière, produits,
+            raclettes pour vitres…). Si vous avez des demandes spécifiques (produits écologiques, marque particulière),
+            vous pouvez nous le préciser.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Comment sont calculés les tarifs ?</div>
+          <div class="faq-a">Les tarifs dépendent principalement du type de prestation, de la surface approximative, de
+            l’état des lieux et de la fréquence (ponctuelle ou régulière). Après votre demande, nous vous envoyons un
+            devis clair, sans surprise.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div
+      style="max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;">
+      <div>© 2026 CleanOcc – Entreprise de nettoyage à Toulouse et 15–20 km autour.</div>
+      <div>
+        <a href="mailto:contact@cleanocc.net"
+          style="color:#2563eb;text-decoration:none;font-weight:500;">contact@cleanocc.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => {
+        const item = q.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+
+    (function () {
+      function devisApiUrl() {
+        var meta = document.querySelector('meta[name="cleanocc-api-origin"]');
+        var explicit = meta && meta.getAttribute('content');
+        if (explicit && String(explicit).trim()) {
+          return String(explicit).replace(/\/+$/, '') + '/api/devis';
+        }
+        if (window.location.protocol === 'file:') {
+          return 'http://127.0.0.1:3000/api/devis';
+        }
+        var host = window.location.hostname;
+        var port = window.location.port;
+        if (host === 'localhost' || host === '127.0.0.1') {
+          if (port && port !== '3000') {
+            return 'http://127.0.0.1:3000/api/devis';
+          }
+        }
+        return '/api/devis';
+      }
+
+      function devisApiFallbackUrls(primary) {
+        var list = [
+          primary,
+          'http://127.0.0.1:3000/api/devis',
+          'http://127.0.0.1:3001/api/devis',
+          'http://localhost:3000/api/devis',
+          'http://localhost:3001/api/devis'
+        ];
+        var seen = {};
+        return list.filter(function (u) {
+          if (seen[u]) return false;
+          seen[u] = true;
+          return true;
+        });
+      }
+
+      const form = document.getElementById('devis-form');
+      const statusEl = document.getElementById('devis-form-status');
+      if (!form || !statusEl) return;
+
+      function showStatus(kind, text) {
+        statusEl.textContent = text;
+        statusEl.className = 'form-status form-full is-visible ' + (kind === 'success' ? 'form-status--success' : 'form-status--error');
+      }
+
+      function hideStatus() {
+        statusEl.className = 'form-status form-full';
+        statusEl.textContent = '';
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideStatus();
+        const btn = form.querySelector('button[type="submit"]');
+        const fd = new FormData(form);
+        const payload = {
+          name: (fd.get('name') || '').trim(),
+          email: (fd.get('email') || '').trim(),
+          phone: (fd.get('phone') || '').trim(),
+          city: (fd.get('city') || '').trim(),
+          service: (fd.get('service') || '').trim(),
+          message: (fd.get('message') || '').trim()
+        };
+        if (!payload.name || !payload.phone || !payload.city || !payload.service || !payload.message) {
+          showStatus('error', 'Merci de remplir tous les champs obligatoires.');
+          return;
+        }
+        btn.disabled = true;
+        var primary = devisApiUrl();
+        var urls = devisApiFallbackUrls(primary);
+        try {
+          var res = null;
+          var data = {};
+          var lastNetworkErr = null;
+          for (var i = 0; i < urls.length; i++) {
+            try {
+              res = await fetch(urls[i], {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              data = await res.json().catch(function () { return {}; });
+              if (res.ok) break;
+              if (res.status === 400 && data.error) break;
+              res = null;
+            } catch (err) {
+              lastNetworkErr = err;
+              res = null;
+            }
+          }
+          if (!res || !res.ok) {
+            if (res && res.status === 400) {
+              showStatus('error', data.error || 'Envoi impossible. Réessayez dans quelques instants.');
+              return;
+            }
+            showStatus('error', 'Connexion au serveur impossible. Lancez « npm start » dans le dossier du site, puis ouvrez la page avec l’adresse affichée dans le terminal (souvent http://localhost:3000), pas un fichier ouvert depuis le disque.');
+            return;
+          }
+          showStatus('success', 'Votre demande a bien été enregistrée. Nous vous recontactons rapidement.');
+          form.reset();
+        } catch (err) {
+          showStatus('error', 'Connexion au serveur impossible. Lancez « npm start » puis ouvrez le site via http://localhost:3000 (ou le port indiqué dans le terminal).');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    })();
+  </script>
+
+</body>
+
+</html>
