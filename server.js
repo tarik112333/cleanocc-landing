@@ -80,4 +80,30 @@ app.post('/api/devis', (req, res) => {
 // --- API : GET devis (admin) ---
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
-app.get('/api/devis', (req, res
+app.get('/api/devis', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+
+  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
+    return res.status(401).json({ error: 'Non autorisé.' });
+  }
+
+  const rows = db.prepare(
+    'SELECT id, name, email, phone, city, service, message, created_at FROM devis_requests ORDER BY id DESC LIMIT 500'
+  ).all();
+
+  res.json(rows);
+});
+
+// --- SERVER ---
+const server = app.listen(PORT, () => {
+  console.log(`CleanOcc — http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Erreur : le port ${PORT} est déjà utilisé.`);
+    process.exit(1);
+  }
+  throw err;
+});
