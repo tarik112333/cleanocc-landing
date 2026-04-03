@@ -4,6 +4,9 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
+const { Resend } = require('resend');
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // --- CONFIG ---
 const PORT = Number(process.env.PORT) || 3000;
@@ -75,6 +78,26 @@ app.post('/api/devis', (req, res) => {
   );
 
   res.status(201).json({ ok: true, id: Number(result.lastInsertRowid) });
+
+  // Envoi email de notification
+  if (resend && process.env.NOTIFY_EMAIL) {
+    resend.emails.send({
+      from: 'CleanOcc <onboarding@resend.dev>',
+      to: process.env.NOTIFY_EMAIL,
+      subject: `Nouvelle demande de devis – ${String(name).trim()}`,
+      html: `
+        <h2>Nouvelle demande de devis CleanOcc</h2>
+        <table>
+          <tr><td><strong>Nom</strong></td><td>${String(name).trim()}</td></tr>
+          <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
+          <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
+          <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
+          <tr><td><strong>Prestation</strong></td><td>${String(service).trim()}</td></tr>
+          <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
+        </table>
+      `
+    }).catch(err => console.error('Resend error:', err));
+  }
 });
 
 // --- API : GET devis (admin) ---

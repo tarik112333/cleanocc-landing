@@ -12,7 +12,7 @@
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://cleanocc.net/" />
   <!-- Si le site est servi ailleurs que sur le même serveur que l’API, indiquez l’origine (ex. http://localhost:3000) -->
-  <meta name="cleanocc-api-origin" content="" />
+  <meta name="cleanocc-api-origin" content="https://cleanocc-landing.onrender.com" />
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
@@ -1305,13 +1305,13 @@
           return String(explicit).replace(/\/+$/, '') + '/api/devis';
         }
         if (window.location.protocol === 'file:') {
-          return 'http://127.0.0.1:3000/api/devis';
+          return 'https://cleanocc-landing.onrender.com/api/devis';
         }
         var host = window.location.hostname;
         var port = window.location.port;
         if (host === 'localhost' || host === '127.0.0.1') {
           if (port && port !== '3000') {
-            return 'http://127.0.0.1:3000/api/devis';
+            return 'https://cleanocc-landing.onrender.com/api/devis';
           }
         }
         return '/api/devis';
@@ -1320,10 +1320,7 @@
       function devisApiFallbackUrls(primary) {
         var list = [
           primary,
-          'http://127.0.0.1:3000/api/devis',
-          'http://127.0.0.1:3001/api/devis',
-          'http://localhost:3000/api/devis',
-          'http://localhost:3001/api/devis'
+          'https://cleanocc-landing.onrender.com/api/devis'
         ];
         var seen = {};
         return list.filter(function (u) {
