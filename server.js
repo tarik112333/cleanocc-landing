@@ -188,7 +188,7 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
   }
 
   try {
-    const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/particuliers', {
+    const result = await urssafRequest('POST', '/homeplus/v1/tiersPrestations/particuliers', {
       civilite: 'M',
       nom: String(nom).trim(),
       prenom: String(prenom).trim(),
