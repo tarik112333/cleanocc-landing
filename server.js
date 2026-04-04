@@ -58,7 +58,9 @@ async function urssafRequest(method, path, body) {
   if (body) opts.body = JSON.stringify(body);
 
   const res = await fetch(`${URSSAF.apiBase}${path}`, opts);
-  const data = await res.json().catch(() => ({}));
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { _raw: text.slice(0, 300) }; }
 
   return { status: res.status, data };
 }
@@ -202,8 +204,9 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
       siretPrestataire: URSSAF.siret,
     });
 
-    res.status(result.status === 200 || result.status === 201 ? 201 : result.status).json({
+    res.status(200).json({
       ok: result.status === 200 || result.status === 201,
+      urssaf_status: result.status,
       urssaf: result.data,
     });
   } catch (err) {
