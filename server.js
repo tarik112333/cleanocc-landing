@@ -8,6 +8,61 @@ const { Resend } = require('resend');
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// --- URSSAF Avance Immédiate ---
+const URSSAF = {
+  clientId: process.env.URSSAF_CLIENT_ID,
+  clientSecret: process.env.URSSAF_CLIENT_SECRET,
+  scope: process.env.URSSAF_SCOPE || 'homeplus.tiersprestations',
+  tokenUrl: process.env.URSSAF_TOKEN_URL || 'https://api.urssaf.fr/api/oauth/v1/token',
+  apiBase: process.env.URSSAF_API_BASE || 'https://api.urssaf.fr',
+  siret: process.env.URSSAF_SIRET,
+};
+
+let urssafToken = null;
+let urssafTokenExpiry = 0;
+
+async function getUrssafToken() {
+  if (urssafToken && Date.now() < urssafTokenExpiry - 60000) return urssafToken;
+
+  const res = await fetch(URSSAF.tokenUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: URSSAF.clientId,
+      client_secret: URSSAF.clientSecret,
+      scope: URSSAF.scope,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`URSSAF token error ${res.status}: ${text}`);
+  }
+
+  const data = await res.json();
+  urssafToken = data.access_token;
+  urssafTokenExpiry = Date.now() + data.expires_in * 1000;
+  return urssafToken;
+}
+
+async function urssafRequest(method, path, body) {
+  const token = await getUrssafToken();
+  const opts = {
+    method,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+
+  const res = await fetch(`${URSSAF.apiBase}${path}`, opts);
+  const data = await res.json().catch(() => ({}));
+
+  return { status: res.status, data };
+}
+
 // --- CONFIG ---
 const PORT = Number(process.env.PORT) || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
@@ -29,6 +84,26 @@ db.exec(`
     city TEXT NOT NULL,
     service TEXT NOT NULL,
     message TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+// --- TABLE AVANCE IMMÉDIATE ---
+db.exec(`
+  CREATE TABLE IF NOT EXISTS avance_immediate (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom TEXT NOT NULL,
+    prenom TEXT NOT NULL,
+    email TEXT NOT NULL,
+    telephone TEXT NOT NULL,
+    adresse TEXT NOT NULL,
+    ville TEXT NOT NULL,
+    code_postal TEXT NOT NULL,
+    prestation TEXT NOT NULL,
+    montant_ttc REAL NOT NULL,
+    date_prestation TEXT NOT NULL,
+    statut TEXT NOT NULL DEFAULT 'en_attente',
+    urssaf_response TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
@@ -96,6 +171,127 @@ app.post('/api/devis', (req, res) => {
           <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
         </table>
       `
+    }).catch(err => console.error('Resend error:', err));
+  }
+});
+
+// --- API : Avance Immédiate – Inscription particulier ---
+app.post('/api/avance-immediate/inscription', async (req, res) => {
+  const { nom, prenom, email, telephone, adresse, ville, codePostal } = req.body || {};
+
+  if (!nom || !prenom || !email || !telephone || !adresse || !ville || !codePostal) {
+    return res.status(400).json({ error: 'Tous les champs sont obligatoires.' });
+  }
+
+  if (!URSSAF.clientId) {
+    return res.status(503).json({ error: 'API URSSAF non configurée.' });
+  }
+
+  try {
+    const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/particuliers', {
+      civilite: 'M',
+      nom: String(nom).trim(),
+      prenom: String(prenom).trim(),
+      email: String(email).trim(),
+      telephone: String(telephone).trim(),
+      adresse: {
+        ligne1: String(adresse).trim(),
+        codePostal: String(codePostal).trim(),
+        ville: String(ville).trim().toUpperCase(),
+      },
+      siretPrestataire: URSSAF.siret,
+    });
+
+    res.status(result.status === 200 || result.status === 201 ? 201 : result.status).json({
+      ok: result.status === 200 || result.status === 201,
+      urssaf: result.data,
+    });
+  } catch (err) {
+    console.error('URSSAF inscription error:', err.message);
+    res.status(500).json({ error: 'Erreur de communication avec l\'URSSAF.', detail: err.message });
+  }
+});
+
+// --- API : Avance Immédiate – Demande de paiement ---
+app.post('/api/avance-immediate/paiement', async (req, res) => {
+  const {
+    nom, prenom, email, telephone,
+    adresse, ville, codePostal,
+    prestation, montantTTC, datePrestation,
+  } = req.body || {};
+
+  if (!nom || !prenom || !email || !telephone || !adresse || !ville || !codePostal || !prestation || !montantTTC || !datePrestation) {
+    return res.status(400).json({ error: 'Tous les champs sont obligatoires.' });
+  }
+
+  if (!URSSAF.clientId) {
+    return res.status(503).json({ error: 'API URSSAF non configurée.' });
+  }
+
+  // Sauvegarde locale
+  const stmt = db.prepare(`
+    INSERT INTO avance_immediate (nom, prenom, email, telephone, adresse, ville, code_postal, prestation, montant_ttc, date_prestation, statut)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'envoyee')
+  `);
+  const row = stmt.run(
+    String(nom).trim(), String(prenom).trim(), String(email).trim(),
+    String(telephone).trim(), String(adresse).trim(), String(ville).trim(),
+    String(codePostal).trim(), String(prestation).trim(),
+    Number(montantTTC), String(datePrestation).trim()
+  );
+  const localId = Number(row.lastInsertRowid);
+
+  try {
+    const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/demandesPaiement', {
+      siretPrestataire: URSSAF.siret,
+      particulier: {
+        nom: String(nom).trim(),
+        prenom: String(prenom).trim(),
+        email: String(email).trim(),
+      },
+      prestation: {
+        nature: String(prestation).trim(),
+        dateDebut: String(datePrestation).trim(),
+        dateFin: String(datePrestation).trim(),
+        montantTTC: Number(montantTTC),
+      },
+    });
+
+    // Mise à jour statut
+    const statut = (result.status === 200 || result.status === 201) ? 'acceptee' : 'erreur_urssaf';
+    db.prepare('UPDATE avance_immediate SET statut = ?, urssaf_response = ? WHERE id = ?')
+      .run(statut, JSON.stringify(result.data), localId);
+
+    res.status(result.status === 200 || result.status === 201 ? 201 : result.status).json({
+      ok: result.status === 200 || result.status === 201,
+      id: localId,
+      urssaf: result.data,
+    });
+  } catch (err) {
+    console.error('URSSAF paiement error:', err.message);
+    db.prepare('UPDATE avance_immediate SET statut = ?, urssaf_response = ? WHERE id = ?')
+      .run('erreur_reseau', err.message, localId);
+    res.status(500).json({ error: 'Erreur de communication avec l\'URSSAF.', detail: err.message, id: localId });
+  }
+
+  // Notification email
+  if (resend && process.env.NOTIFY_EMAIL) {
+    resend.emails.send({
+      from: 'CleanOcc <onboarding@resend.dev>',
+      to: process.env.NOTIFY_EMAIL,
+      subject: `Avance Immédiate – ${String(prenom).trim()} ${String(nom).trim()}`,
+      html: `
+        <h2>Nouvelle demande Avance Immédiate</h2>
+        <table>
+          <tr><td><strong>Nom</strong></td><td>${String(prenom).trim()} ${String(nom).trim()}</td></tr>
+          <tr><td><strong>Email</strong></td><td>${String(email).trim()}</td></tr>
+          <tr><td><strong>Téléphone</strong></td><td>${String(telephone).trim()}</td></tr>
+          <tr><td><strong>Adresse</strong></td><td>${String(adresse).trim()}, ${String(codePostal).trim()} ${String(ville).trim()}</td></tr>
+          <tr><td><strong>Prestation</strong></td><td>${String(prestation).trim()}</td></tr>
+          <tr><td><strong>Montant TTC</strong></td><td>${Number(montantTTC).toFixed(2)} €</td></tr>
+          <tr><td><strong>Date</strong></td><td>${String(datePrestation).trim()}</td></tr>
+        </table>
+      `,
     }).catch(err => console.error('Resend error:', err));
   }
 });

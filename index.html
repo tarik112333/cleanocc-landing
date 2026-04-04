@@ -10,7 +10,7 @@
   <meta name="description"
     content="CleanOcc, entreprise de nettoyage à Toulouse et alentours (15–20 km) : lavage de vitres, nettoyage de bureaux et locaux professionnels, fin de location et fin de chantier. Plus de 20 clients satisfaits, note moyenne 4,6/5. Devis rapide et gratuit." />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://cleanocc.net/" />
+  <link rel="canonical" href="https://cleanocc.fr/" />
   <!-- Si le site est servi ailleurs que sur le même serveur que l’API, indiquez l’origine (ex. http://localhost:3000) -->
   <meta name="cleanocc-api-origin" content="https://cleanocc-landing.onrender.com" />
 
@@ -368,6 +368,114 @@
       font-size: 0.94rem;
       color: var(--muted);
       max-width: 520px;
+    }
+
+    /* AVANCE IMMÉDIATE */
+    .avance-section {
+      background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      margin-bottom: 72px;
+    }
+
+    .avance-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin: 32px 0 36px;
+    }
+
+    .avance-step {
+      background: white;
+      border-radius: 14px;
+      padding: 24px 20px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    }
+
+    .avance-step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+
+    .avance-step h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .avance-step p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .avance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .avance-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: -8px;
+      margin-bottom: 32px;
+    }
+
+    .avance-form {
+      background: white;
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .avance-form label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+
+    .avance-form input,
+    .avance-form select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: #f8fafc;
+    }
+
+    .avance-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
     }
 
     /* SERVICES */
@@ -933,6 +1041,7 @@
     <section class="hero">
       <div>
         <div class="hero-badge"><span></span>Entreprise de nettoyage à Toulouse & alentours</div>
+        <div class="avance-badge">✅ Avance Immédiate disponible – Payez seulement 50%</div>
         <h1>Nettoyage professionnel à <em>Toulouse</em> et 20 km autour.</h1>
         <p class="hero-sub">
           Lavage de vitres, nettoyage de bureaux et locaux professionnels, fin de location et fin de chantier.
@@ -1009,6 +1118,89 @@
           <div class="service-tagline">Pour livrer un chantier propre et prêt à être utilisé.</div>
         </article>
       </div>
+    </section>
+
+    <!-- AVANCE IMMÉDIATE -->
+    <section id="avance-immediate" class="avance-section">
+      <header class="section-header">
+        <div class="section-eyebrow">Avantage fiscal</div>
+        <h2>Payez seulement 50% grâce à l'Avance Immédiate</h2>
+        <p class="section-sub">Grâce au dispositif URSSAF d'Avance Immédiate de crédit d'impôt, l'État vous rembourse instantanément 50% du coût de votre prestation — sans attendre votre déclaration d'impôts. Vous payez la moitié, directement à la facturation.</p>
+      </header>
+      <div class="avance-steps">
+        <div class="avance-step">
+          <div class="avance-step-num">1</div>
+          <h3>Vous faites appel à CleanOcc</h3>
+          <p>Vous réservez votre prestation de nettoyage à domicile comme d'habitude.</p>
+        </div>
+        <div class="avance-step">
+          <div class="avance-step-num">2</div>
+          <h3>L'État avance votre crédit d'impôt</h3>
+          <p>L'URSSAF déduit automatiquement 50% du montant au moment de la facturation. Aucune démarche de votre côté.</p>
+        </div>
+        <div class="avance-step">
+          <div class="avance-step-num">3</div>
+          <h3>Vous ne payez que la moitié</h3>
+          <p>Un nettoyage à 100 € vous revient à 50 €. Immédiatement, sans avance de trésorerie.</p>
+        </div>
+      </div>
+      <!-- Formulaire Avance Immédiate -->
+      <form id="avance-form" class="avance-form" autocomplete="on">
+        <h3 style="margin-bottom:16px;font-size:1.05rem;">Bénéficier de l'Avance Immédiate</h3>
+        <div class="avance-form-grid">
+          <div>
+            <label for="ai-prenom">Prénom *</label>
+            <input type="text" id="ai-prenom" name="prenom" required />
+          </div>
+          <div>
+            <label for="ai-nom">Nom *</label>
+            <input type="text" id="ai-nom" name="nom" required />
+          </div>
+          <div>
+            <label for="ai-email">Email *</label>
+            <input type="email" id="ai-email" name="email" required />
+          </div>
+          <div>
+            <label for="ai-telephone">Téléphone *</label>
+            <input type="tel" id="ai-telephone" name="telephone" required />
+          </div>
+          <div>
+            <label for="ai-adresse">Adresse du domicile *</label>
+            <input type="text" id="ai-adresse" name="adresse" required />
+          </div>
+          <div>
+            <label for="ai-ville">Ville *</label>
+            <input type="text" id="ai-ville" name="ville" required />
+          </div>
+          <div>
+            <label for="ai-cp">Code postal *</label>
+            <input type="text" id="ai-cp" name="codePostal" pattern="[0-9]{5}" required />
+          </div>
+          <div>
+            <label for="ai-prestation">Type de prestation *</label>
+            <select id="ai-prestation" name="prestation" required>
+              <option value="">Choisir…</option>
+              <option value="menage-domicile">Ménage à domicile</option>
+              <option value="nettoyage-vitres-domicile">Nettoyage de vitres à domicile</option>
+              <option value="repassage">Repassage</option>
+              <option value="grand-menage">Grand ménage / ménage de printemps</option>
+            </select>
+          </div>
+          <div>
+            <label for="ai-montant">Montant TTC estimé (€) *</label>
+            <input type="number" id="ai-montant" name="montantTTC" min="1" step="0.01" required />
+          </div>
+          <div>
+            <label for="ai-date">Date souhaitée *</label>
+            <input type="date" id="ai-date" name="datePrestation" required />
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:0.84rem;color:#64748b;">
+          Montant à votre charge : <strong id="ai-reste" style="color:#166534;">0,00 €</strong> (50% pris en charge par l'État)
+        </div>
+        <button type="submit" class="btn-primary" style="margin-top:20px;">Envoyer ma demande – Avance Immédiate</button>
+        <div id="avance-status" aria-live="polite" style="margin-top:12px;font-size:0.88rem;"></div>
+      </form>
     </section>
 
     <!-- ZONES -->
@@ -1131,6 +1323,7 @@
                 <option value="bureaux">Nettoyage de bureaux / locaux professionnels</option>
                 <option value="fin-location">Nettoyage de fin de location</option>
                 <option value="fin-chantier">Nettoyage de fin de chantier</option>
+                <option value="avance-immediate">Nettoyage à domicile – Avance Immédiate (50% pris en charge)</option>
                 <option value="autre">Autre demande de nettoyage</option>
               </select>
             </div>
@@ -1151,7 +1344,7 @@
           <strong>Contact direct</strong>
           <div class="contact-row">
             <a href="tel:+33768140560" class="contact-chip">📞 07 68 14 05 60</a>
-            <a href="mailto:contact@cleanocc.net" class="contact-chip">✉️ contact@cleanocc.net</a>
+            <a href="mailto:contact@cleanocc.fr" class="contact-chip">✉️ contact@cleanocc.fr</a>
             <a href="https://wa.me/33768140560?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20un%20nettoyage%20%C3%A0%20Toulouse."
               target="_blank" class="contact-chip">💬 WhatsApp – message direct</a>
           </div>
@@ -1281,8 +1474,8 @@
       style="max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;">
       <div>© 2026 CleanOcc – Entreprise de nettoyage à Toulouse et 15–20 km autour.</div>
       <div>
-        <a href="mailto:contact@cleanocc.net"
-          style="color:#2563eb;text-decoration:none;font-weight:500;">contact@cleanocc.net</a>
+        <a href="mailto:contact@cleanocc.fr"
+          style="color:#2563eb;text-decoration:none;font-weight:500;">contact@cleanocc.fr</a>
       </div>
     </div>
   </footer>
@@ -1396,6 +1589,75 @@
           form.reset();
         } catch (err) {
           showStatus('error', 'Connexion au serveur impossible. Lancez « npm start » puis ouvrez le site via http://localhost:3000 (ou le port indiqué dans le terminal).');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    })();
+
+    // --- Avance Immédiate ---
+    (function () {
+      var form = document.getElementById('avance-form');
+      var statusEl = document.getElementById('avance-status');
+      var montantInput = document.getElementById('ai-montant');
+      var resteEl = document.getElementById('ai-reste');
+      if (!form) return;
+
+      // Calcul 50% en temps réel
+      montantInput.addEventListener('input', function () {
+        var val = parseFloat(montantInput.value) || 0;
+        resteEl.textContent = (val / 2).toFixed(2).replace('.', ',') + ' €';
+      });
+
+      function apiBase() {
+        var meta = document.querySelector('meta[name="cleanocc-api-origin"]');
+        var explicit = meta && meta.getAttribute('content');
+        if (explicit && String(explicit).trim()) return String(explicit).replace(/\/+$/, '');
+        if (window.location.protocol === 'file:') return 'https://cleanocc-landing.onrender.com';
+        return '';
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        statusEl.textContent = '';
+        statusEl.style.color = '';
+        var btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+
+        var fd = new FormData(form);
+        var payload = {
+          nom: (fd.get('nom') || '').trim(),
+          prenom: (fd.get('prenom') || '').trim(),
+          email: (fd.get('email') || '').trim(),
+          telephone: (fd.get('telephone') || '').trim(),
+          adresse: (fd.get('adresse') || '').trim(),
+          ville: (fd.get('ville') || '').trim(),
+          codePostal: (fd.get('codePostal') || '').trim(),
+          prestation: (fd.get('prestation') || '').trim(),
+          montantTTC: parseFloat(fd.get('montantTTC')) || 0,
+          datePrestation: (fd.get('datePrestation') || '').trim(),
+        };
+
+        try {
+          var res = await fetch(apiBase() + '/api/avance-immediate/paiement', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          var data = await res.json().catch(function () { return {}; });
+
+          if (res.ok && data.ok) {
+            statusEl.style.color = '#166534';
+            statusEl.textContent = 'Demande envoyée ! Votre client ne paiera que ' + (payload.montantTTC / 2).toFixed(2).replace('.', ',') + ' € grâce à l\'Avance Immédiate. Nous vous recontactons rapidement.';
+            form.reset();
+            resteEl.textContent = '0,00 €';
+          } else {
+            statusEl.style.color = '#dc2626';
+            statusEl.textContent = data.error || 'Une erreur est survenue. Réessayez ou contactez-nous par téléphone.';
+          }
+        } catch (err) {
+          statusEl.style.color = '#dc2626';
+          statusEl.textContent = 'Connexion impossible. Vérifiez votre connexion internet ou contactez-nous au 07 68 14 05 60.';
         } finally {
           btn.disabled = false;
         }
