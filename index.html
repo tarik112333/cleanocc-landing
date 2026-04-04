@@ -918,6 +918,93 @@
       }
     }
 
+    /* CHECKBOX AVANCE IMMÉDIATE */
+    .avance-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(37,99,235,0.2);
+      background: rgba(37,99,235,0.04);
+      cursor: pointer;
+      font-size: 0.88rem;
+      color: #0f172a;
+      transition: border-color 0.18s, background 0.18s;
+    }
+
+    .avance-checkbox-label:hover {
+      border-color: rgba(37,99,235,0.4);
+      background: rgba(37,99,235,0.07);
+    }
+
+    .avance-checkbox-label input[type="checkbox"] {
+      display: none;
+    }
+
+    .avance-checkbox-box {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.18s, background 0.18s;
+    }
+
+    .avance-checkbox-label input:checked ~ .avance-checkbox-box {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .avance-checkbox-label input:checked ~ .avance-checkbox-box::after {
+      content: '✓';
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .avance-checkbox-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #16a34a;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    .avance-extra {
+      margin-top: -4px;
+    }
+
+    .avance-extra-inner {
+      background: rgba(37,99,235,0.04);
+      border: 1.5px solid rgba(37,99,235,0.15);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .avance-extra-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .avance-extra-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+    }
+
     /* CONTACT */
     .contact {
       display: grid;
@@ -1569,49 +1656,11 @@
           </div>
         </div>
 
-        <!-- FORMULAIRE INSCRIPTION -->
-        <div class="avance-form-card">
-          <div class="avance-form-title">Activer mon avance immédiate</div>
-          <p class="avance-form-sub">Réservé aux particuliers · Gratuit · Sans engagement</p>
-          <form id="avance-form">
-            <div class="avance-field">
-              <label for="ai-prenom">Prénom *</label>
-              <input type="text" id="ai-prenom" name="prenom" placeholder="Votre prénom" required />
-            </div>
-            <div class="avance-field">
-              <label for="ai-nom">Nom *</label>
-              <input type="text" id="ai-nom" name="nom" placeholder="Votre nom" required />
-            </div>
-            <div class="avance-field">
-              <label for="ai-email">Email *</label>
-              <input type="email" id="ai-email" name="email" placeholder="exemple@domaine.com" required />
-            </div>
-            <div class="avance-field">
-              <label for="ai-telephone">Téléphone *</label>
-              <input type="tel" id="ai-telephone" name="telephone" placeholder="06 XX XX XX XX" required />
-            </div>
-            <div class="avance-field avance-field-full">
-              <label for="ai-adresse">Adresse *</label>
-              <input type="text" id="ai-adresse" name="adresse" placeholder="Numéro et nom de rue" required />
-            </div>
-            <div class="avance-field">
-              <label for="ai-cp">Code postal *</label>
-              <input type="text" id="ai-cp" name="codePostal" placeholder="31000" required />
-            </div>
-            <div class="avance-field">
-              <label for="ai-ville">Ville *</label>
-              <input type="text" id="ai-ville" name="ville" placeholder="Toulouse" required />
-            </div>
-            <div class="avance-field avance-field-full">
-              <button type="submit" class="btn-avance" style="width:100%;justify-content:center;border:none;cursor:pointer;font-size:0.95rem;">
-                Activer mon avance immédiate →
-              </button>
-            </div>
-            <div id="avance-form-status" class="avance-form-status avance-field-full" role="status" aria-live="polite"></div>
-          </form>
-          <p class="avance-conditions" style="margin-top:14px;">
+        <div class="avance-footer">
+          <p class="avance-conditions">
             <strong>Conditions :</strong> réservé aux <strong>particuliers</strong> pour des prestations à domicile. Non applicable aux professionnels. Valable imposable ou non.
           </p>
+          <a href="#contact" class="btn-avance">En profiter – Devis gratuit →</a>
         </div>
       </div>
     </section>
@@ -1627,12 +1676,16 @@
       </header>
       <div class="contact">
         <div class="contact-card">
-          <h3>Formulaire de contact</h3>
-          <p>Quelques informations suffisent pour vous donner un premier retour sur le prix et la disponibilité.</p>
+          <h3>Demande de devis gratuit</h3>
+          <p>Remplissez ce formulaire, nous vous répondons rapidement. Particulier ? Activez l’avance immédiate directement ici.</p>
           <form id="devis-form" method="post" action="/api/devis">
             <div>
-              <label for="name">Nom complet *</label>
-              <input type="text" id="name" name="name" placeholder="Nom et prénom" required />
+              <label for="prenom">Prénom *</label>
+              <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required />
+            </div>
+            <div>
+              <label for="nom">Nom *</label>
+              <input type="text" id="nom" name="nom" placeholder="Votre nom" required />
             </div>
             <div>
               <label for="email">Email</label>
@@ -1662,9 +1715,35 @@
               <textarea id="message" name="message"
                 placeholder="Surface approximative, fréquence souhaitée, particularités du lieu…" required></textarea>
             </div>
+
+            <!-- AVANCE IMMÉDIATE TOGGLE -->
+            <div class="form-full">
+              <label class="avance-checkbox-label">
+                <input type="checkbox" id="avance-toggle" name="avanceImmediate" />
+                <span class="avance-checkbox-box"></span>
+                <span>Je suis <strong>particulier</strong> et souhaite bénéficier de l’avance immédiate <span class="avance-checkbox-badge">−50%</span></span>
+              </label>
+            </div>
+
+            <div id="avance-extra" class="form-full avance-extra" style="display:none;">
+              <div class="avance-extra-inner">
+                <div class="avance-extra-label">Informations pour l’avance immédiate (URSSAF)</div>
+                <div class="avance-extra-grid">
+                  <div class="form-full" style="grid-column:1/-1">
+                    <label for="adresse">Adresse *</label>
+                    <input type="text" id="adresse" name="adresse" placeholder="Numéro et nom de rue" />
+                  </div>
+                  <div>
+                    <label for="codePostal">Code postal *</label>
+                    <input type="text" id="codePostal" name="codePostal" placeholder="31000" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-full form-actions">
               <button type="submit" class="btn-primary" style="border:none;cursor:pointer;font-size:0.97rem;padding:14px 30px;width:100%;justify-content:center;">
-                Envoyer ma demande de devis →
+                Envoyer ma demande →
               </button>
               <div class="form-helper" style="width:100%;text-align:center;">🔒 Réponse garantie sous 24h (hors week-end) · Devis gratuit et sans engagement.</div>
             </div>
@@ -1858,134 +1937,120 @@
         });
       }
 
-      const form = document.getElementById('devis-form');
-      const statusEl = document.getElementById('devis-form-status');
+      // Toggle avance immédiate extra fields
+      const toggle = document.getElementById(‘avance-toggle’);
+      const avanceExtra = document.getElementById(‘avance-extra’);
+      if (toggle && avanceExtra) {
+        toggle.addEventListener(‘change’, function () {
+          avanceExtra.style.display = this.checked ? ‘block’ : ‘none’;
+          avanceExtra.querySelectorAll(‘input’).forEach(function (inp) {
+            inp.required = toggle.checked;
+          });
+        });
+      }
+
+      const form = document.getElementById(‘devis-form’);
+      const statusEl = document.getElementById(‘devis-form-status’);
       if (!form || !statusEl) return;
 
       function showStatus(kind, text) {
         statusEl.textContent = text;
-        statusEl.className = 'form-status form-full is-visible ' + (kind === 'success' ? 'form-status--success' : 'form-status--error');
+        statusEl.className = ‘form-status form-full is-visible ‘ + (kind === ‘success’ ? ‘form-status--success’ : ‘form-status--error’);
       }
 
       function hideStatus() {
-        statusEl.className = 'form-status form-full';
-        statusEl.textContent = '';
+        statusEl.className = ‘form-status form-full’;
+        statusEl.textContent = ‘’;
       }
 
-      form.addEventListener('submit', async function (e) {
+      form.addEventListener(‘submit’, async function (e) {
         e.preventDefault();
         hideStatus();
-        const btn = form.querySelector('button[type="submit"]');
+        const btn = form.querySelector(‘button[type="submit"]’);
         const fd = new FormData(form);
-        const payload = {
-          name: (fd.get('name') || '').trim(),
-          email: (fd.get('email') || '').trim(),
-          phone: (fd.get('phone') || '').trim(),
-          city: (fd.get('city') || '').trim(),
-          service: (fd.get('service') || '').trim(),
-          message: (fd.get('message') || '').trim()
+        const prenom = (fd.get(‘prenom’) || ‘’).trim();
+        const nom = (fd.get(‘nom’) || ‘’).trim();
+        const avance = toggle && toggle.checked;
+
+        const devisPayload = {
+          name: (prenom + ‘ ‘ + nom).trim(),
+          email: (fd.get(‘email’) || ‘’).trim(),
+          phone: (fd.get(‘phone’) || ‘’).trim(),
+          city: (fd.get(‘city’) || ‘’).trim(),
+          service: (fd.get(‘service’) || ‘’).trim(),
+          message: (fd.get(‘message’) || ‘’).trim()
         };
-        if (!payload.name || !payload.phone || !payload.city || !payload.service || !payload.message) {
-          showStatus('error', 'Merci de remplir tous les champs obligatoires.');
+
+        if (!devisPayload.name || !devisPayload.phone || !devisPayload.city || !devisPayload.service || !devisPayload.message) {
+          showStatus(‘error’, ‘Merci de remplir tous les champs obligatoires.’);
           return;
         }
+
         btn.disabled = true;
-        var primary = devisApiUrl();
-        var urls = devisApiFallbackUrls(primary);
+        btn.textContent = ‘Envoi en cours…’;
+
+        const apiBase = (function () {
+          const meta = document.querySelector(‘meta[name="cleanocc-api-origin"]’);
+          const explicit = meta && meta.getAttribute(‘content’);
+          if (explicit && explicit.trim()) return explicit.replace(/\/+$/, ‘’);
+          if (window.location.protocol === ‘file:’) return ‘https://cleanocc-landing.onrender.com’;
+          return ‘’;
+        })();
+
         try {
-          var res = null;
-          var data = {};
-          var lastNetworkErr = null;
+          // Envoi devis
+          var primary = devisApiUrl();
+          var urls = devisApiFallbackUrls(primary);
+          var res = null, data = {};
           for (var i = 0; i < urls.length; i++) {
             try {
               res = await fetch(urls[i], {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify(payload)
+                method: ‘POST’,
+                headers: { ‘Content-Type’: ‘application/json’, Accept: ‘application/json’ },
+                body: JSON.stringify(devisPayload)
               });
               data = await res.json().catch(function () { return {}; });
               if (res.ok) break;
               if (res.status === 400 && data.error) break;
               res = null;
-            } catch (err) {
-              lastNetworkErr = err;
-              res = null;
-            }
+            } catch (err) { res = null; }
           }
+
           if (!res || !res.ok) {
-            if (res && res.status === 400) {
-              showStatus('error', data.error || 'Envoi impossible. Réessayez dans quelques instants.');
-              return;
-            }
-            showStatus('error', 'Connexion au serveur impossible. Lancez « npm start » dans le dossier du site, puis ouvrez la page avec l’adresse affichée dans le terminal (souvent http://localhost:3000), pas un fichier ouvert depuis le disque.');
+            showStatus(‘error’, (res && res.status === 400 && data.error) ? data.error : ‘Connexion au serveur impossible. Réessayez dans quelques instants.’);
             return;
           }
-          showStatus('success', 'Votre demande a bien été enregistrée. Nous vous recontactons rapidement.');
-          form.reset();
-        } catch (err) {
-          showStatus('error', 'Connexion au serveur impossible. Lancez « npm start » puis ouvrez le site via http://localhost:3000 (ou le port indiqué dans le terminal).');
-        } finally {
-          btn.disabled = false;
-        }
-      });
-    })();
 
-    // --- AVANCE IMMÉDIATE ---
-    (function () {
-      const form = document.getElementById('avance-form');
-      const statusEl = document.getElementById('avance-form-status');
-      if (!form || !statusEl) return;
-
-      function showStatus(kind, text) {
-        statusEl.textContent = text;
-        statusEl.className = 'avance-form-status avance-field-full is-visible avance-form-status--' + kind;
-      }
-
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const btn = form.querySelector('button[type="submit"]');
-        const fd = new FormData(form);
-        const payload = {
-          prenom: (fd.get('prenom') || '').trim(),
-          nom: (fd.get('nom') || '').trim(),
-          email: (fd.get('email') || '').trim(),
-          telephone: (fd.get('telephone') || '').trim(),
-          adresse: (fd.get('adresse') || '').trim(),
-          codePostal: (fd.get('codePostal') || '').trim(),
-          ville: (fd.get('ville') || '').trim(),
-        };
-
-        btn.disabled = true;
-        btn.textContent = 'Envoi en cours…';
-        statusEl.className = 'avance-form-status avance-field-full';
-
-        try {
-          const apiBase = (function () {
-            const meta = document.querySelector('meta[name="cleanocc-api-origin"]');
-            const explicit = meta && meta.getAttribute('content');
-            if (explicit && explicit.trim()) return explicit.replace(/\/+$/, '');
-            if (window.location.protocol === 'file:') return 'https://cleanocc-landing.onrender.com';
-            return '';
-          })();
-
-          const res = await fetch(apiBase + '/api/avance-immediate/inscription', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          const data = await res.json().catch(() => ({}));
-
-          if (res.ok) {
-            showStatus('success', '✓ Inscription envoyée ! Votre demande d\'avance immédiate a bien été transmise à l\'URSSAF.');
-            form.reset();
-          } else {
-            showStatus('error', data.error || 'Une erreur est survenue. Merci de réessayer ou de nous contacter directement.');
+          // Envoi avance immédiate si cochée
+          if (avance) {
+            const avancePayload = {
+              prenom, nom,
+              email: devisPayload.email,
+              telephone: devisPayload.phone,
+              adresse: (fd.get(‘adresse’) || ‘’).trim(),
+              codePostal: (fd.get(‘codePostal’) || ‘’).trim(),
+              ville: devisPayload.city,
+            };
+            try {
+              await fetch(apiBase + ‘/api/avance-immediate/inscription’, {
+                method: ‘POST’,
+                headers: { ‘Content-Type’: ‘application/json’, Accept: ‘application/json’ },
+                body: JSON.stringify(avancePayload),
+              });
+            } catch (_) {}
           }
+
+          showStatus(‘success’, avance
+            ? ‘✓ Demande envoyée ! Votre devis et votre inscription à l\’avance immédiate ont bien été enregistrés. Nous vous recontactons rapidement.’
+            : ‘✓ Votre demande a bien été enregistrée. Nous vous recontactons rapidement.’
+          );
+          form.reset();
+          if (avanceExtra) avanceExtra.style.display = ‘none’;
         } catch (err) {
-          showStatus('error', 'Connexion au serveur impossible. Merci de réessayer dans quelques instants.');
+          showStatus(‘error’, ‘Connexion au serveur impossible. Réessayez dans quelques instants.’);
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Activer mon avance immédiate →';
+          btn.textContent = ‘Envoyer ma demande →’;
         }
       });
     })();
