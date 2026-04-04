@@ -8,11 +8,142 @@
 
   <!-- SEO -->
   <meta name="description"
-    content="CleanOcc, entreprise de nettoyage à Toulouse et alentours (15–20 km) : lavage de vitres, nettoyage de bureaux et locaux professionnels, fin de location et fin de chantier. Plus de 20 clients satisfaits, note moyenne 4,6/5. Devis rapide et gratuit." />
+    content="CleanOcc, entreprise de nettoyage à Toulouse et alentours (15–20 km) : lavage de vitres, fin de location, fin de chantier. Avance immédiate de crédit d'impôt 50% pour les particuliers. Note 4,6/5 · Devis gratuit." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://cleanocc.fr/" />
+  <meta name="author" content="CleanOcc" />
+  <meta name="geo.region" content="FR-31" />
+  <meta name="geo.placename" content="Toulouse" />
+  <meta name="geo.position" content="43.604652;1.444209" />
+  <meta name="ICBM" content="43.604652, 1.444209" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cleanocc.fr/" />
+  <meta property="og:title" content="Entreprise de Nettoyage à Toulouse – CleanOcc" />
+  <meta property="og:description"
+    content="Lavage de vitres, nettoyage de bureaux, fin de location et fin de chantier à Toulouse et 15–20 km autour. Note 4,6/5 · Devis gratuit en 24h." />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:site_name" content="CleanOcc" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Entreprise de Nettoyage à Toulouse – CleanOcc" />
+  <meta name="twitter:description"
+    content="Lavage de vitres, nettoyage de bureaux, fin de location à Toulouse. Note 4,6/5 · Devis gratuit." />
   <!-- Si le site est servi ailleurs que sur le même serveur que l’API, indiquez l’origine (ex. http://localhost:3000) -->
   <meta name="cleanocc-api-origin" content="https://cleanocc-landing.onrender.com" />
+
+  <!-- Données structurées JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "CleanOcc",
+    "description": "Entreprise de nettoyage à Toulouse et alentours : lavage de vitres, nettoyage de bureaux et locaux professionnels, fin de location, fin de chantier.",
+    "url": "https://cleanocc.fr/",
+    "telephone": "+33768140560",
+    "email": "contact@cleanocc.net",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Toulouse",
+      "addressRegion": "Occitanie",
+      "postalCode": "31000",
+      "addressCountry": "FR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 43.604652,
+      "longitude": 1.444209
+    },
+    "areaServed": {
+      "@type": "GeoCircle",
+      "geoMidpoint": {
+        "@type": "GeoCoordinates",
+        "latitude": 43.604652,
+        "longitude": 1.444209
+      },
+      "geoRadius": "20000"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.6",
+      "reviewCount": "20",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "priceRange": "€€",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "08:00",
+        "closes": "19:00"
+      }
+    ],
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Services de nettoyage",
+      "itemListElement": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Lavage de vitres" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Nettoyage de bureaux et locaux professionnels" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Nettoyage de fin de location" } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Nettoyage de fin de chantier" } }
+      ]
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <!-- FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Travaillez-vous avec les particuliers, les professionnels, ou les deux ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Nous travaillons aussi bien avec les particuliers (maisons, appartements, fin de location) qu'avec les professionnels (bureaux, cabinets, commerces, locaux professionnels). Le devis est adapté à votre situation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Pouvez-vous intervenir rapidement pour une fin de location ou un chantier ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, dans la mesure des disponibilités, nous pouvons intervenir rapidement pour une remise en état avant un état des lieux ou une livraison de chantier. Le mieux est de nous contacter par téléphone ou WhatsApp pour voir ensemble la date exacte."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Fournissez-vous les produits et le matériel de nettoyage ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, nous pouvons fournir tout le matériel nécessaire (aspirateur, serpillière, produits, raclettes pour vitres…). Si vous avez des demandes spécifiques (produits écologiques, marque particulière), vous pouvez nous le préciser."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Comment sont calculés les tarifs ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Les tarifs dépendent principalement du type de prestation, de la surface approximative, de l'état des lieux et de la fréquence (ponctuelle ou régulière). Après votre demande, nous vous envoyons un devis clair, sans surprise."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Puis-je bénéficier de l'avance immédiate de crédit d'impôt ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, si vous êtes un particulier. L'avance immédiate de crédit d'impôt vous permet de ne payer que 50 % de la facture au moment de la prestation — l'État verse directement les 50 % restants à CleanOcc. Ce dispositif est accessible via votre espace personnel sur impots.gouv.fr, que vous soyez imposable ou non. Attention : ce dispositif ne s'applique pas aux professionnels et entreprises."
+        }
+      }
+    ]
+  }
+  </script>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet" />
@@ -613,6 +744,199 @@
       margin-top: 4px;
     }
 
+    /* AVANCE IMMÉDIATE */
+    .avance-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
+      border-radius: 22px;
+      padding: 40px 36px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avance-banner::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%);
+      pointer-events: none;
+    }
+
+    .avance-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .avance-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #93c5fd;
+      margin-bottom: 10px;
+    }
+
+    .avance-eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.3);
+      flex-shrink: 0;
+    }
+
+    .avance-title {
+      font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .avance-title em {
+      font-style: normal;
+      color: #60a5fa;
+    }
+
+    .avance-sub {
+      font-size: 0.9rem;
+      color: #bfdbfe;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .avance-badge {
+      background: rgba(34,197,94,0.15);
+      border: 1.5px solid rgba(34,197,94,0.45);
+      border-radius: 16px;
+      padding: 16px 22px;
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 150px;
+    }
+
+    .avance-badge-number {
+      font-size: 2.6rem;
+      font-weight: 900;
+      line-height: 1;
+      color: #4ade80;
+      letter-spacing: -0.06em;
+    }
+
+    .avance-badge-label {
+      font-size: 0.78rem;
+      color: #86efac;
+      font-weight: 600;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    .avance-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .avance-step {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 16px 14px;
+    }
+
+    .avance-step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(96,165,250,0.25);
+      color: #93c5fd;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .avance-step h4 {
+      font-size: 0.87rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+
+    .avance-step p {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .avance-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .avance-conditions {
+      font-size: 0.78rem;
+      color: #64748b;
+      max-width: 480px;
+      line-height: 1.55;
+    }
+
+    .avance-conditions strong {
+      color: #94a3b8;
+    }
+
+    .btn-avance {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      box-shadow: 0 12px 28px rgba(34,197,94,0.35);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 700px) {
+      .avance-banner {
+        padding: 28px 20px;
+      }
+      .avance-steps {
+        grid-template-columns: 1fr;
+      }
+      .avance-badge {
+        min-width: unset;
+        width: 100%;
+      }
+      .avance-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
     /* CONTACT */
     .contact {
       display: grid;
@@ -623,27 +947,30 @@
 
     .contact-card {
       background: #ffffff;
-      border-radius: 18px;
-      padding: 18px 18px 16px;
-      border: 1px solid rgba(209, 213, 219, 0.9);
-      box-shadow: var(--shadow-soft);
+      border-radius: 20px;
+      padding: 28px 26px 24px;
+      border: 1.5px solid rgba(37, 99, 235, 0.12);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.09), 0 0 0 0px rgba(37,99,235,0.05);
     }
 
     .contact-card h3 {
-      font-size: 1rem;
-      margin-bottom: 4px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #0f172a;
     }
 
-    .contact-card p {
+    .contact-card > p {
       font-size: 0.88rem;
       color: var(--muted);
-      margin-bottom: 10px;
+      margin-bottom: 18px;
+      line-height: 1.55;
     }
 
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px 14px;
+      gap: 14px 16px;
       font-size: 0.85rem;
     }
 
@@ -653,26 +980,49 @@
 
     label {
       display: block;
-      margin-bottom: 4px;
-      font-weight: 500;
-      color: #0f172a;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      color: #374151;
+      letter-spacing: 0.01em;
     }
 
     input,
     textarea,
     select {
       width: 100%;
-      padding: 8px 10px;
+      padding: 11px 14px;
       border-radius: 10px;
-      border: 1px solid #cbd5f5;
+      border: 1.5px solid #e2e8f0;
       font-family: inherit;
-      font-size: 0.86rem;
-      background: #f9fafb;
+      font-size: 0.88rem;
+      background: #ffffff;
+      color: #0f172a;
       outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    input:hover,
+    textarea:hover,
+    select:hover {
+      border-color: #cbd5e1;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      background: #fff;
     }
 
     textarea {
-      min-height: 80px;
+      min-height: 96px;
       resize: vertical;
     }
 
@@ -685,10 +1035,10 @@
     .form-status {
       display: none;
       font-size: 0.86rem;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 10px;
       margin-top: 8px;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
     .form-status.is-visible {
@@ -715,9 +1065,9 @@
     .form-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .contact-infos {
@@ -1285,6 +1635,53 @@
       </div>
     </section>
 
+    <!-- AVANCE IMMÉDIATE -->
+    <section id="avance-immediate">
+      <div class="avance-banner">
+        <div class="avance-top">
+          <div>
+            <div class="avance-eyebrow"><span class="avance-eyebrow-dot"></span>Service à la personne agréé</div>
+            <h2 class="avance-title">Payez seulement <em>50%</em> de votre facture.<br>L'État rembourse le reste.</h2>
+            <p class="avance-sub">
+              Grâce à l'avance immédiate de crédit d'impôt, vous bénéficiez directement de la réduction fiscale de 50 %
+              au moment du paiement — sans attendre votre déclaration de revenus.<br>
+              <strong style="color:#fde68a;">Réservé aux particuliers uniquement.</strong>
+            </p>
+          </div>
+          <div class="avance-badge">
+            <div class="avance-badge-number">50%</div>
+            <div class="avance-badge-label">de réduction<br>immédiate</div>
+          </div>
+        </div>
+
+        <div class="avance-steps">
+          <div class="avance-step">
+            <div class="avance-step-num">1</div>
+            <h4>Vous demandez un devis</h4>
+            <p>On établit votre devis et on vous inscrit au dispositif avance immédiate via votre espace CESU ou URSSAF.</p>
+          </div>
+          <div class="avance-step">
+            <div class="avance-step-num">2</div>
+            <h4>On réalise la prestation</h4>
+            <p>Le nettoyage est effectué normalement. Rien ne change pour vous sur le déroulement.</p>
+          </div>
+          <div class="avance-step">
+            <div class="avance-step-num">3</div>
+            <h4>Vous payez 50%</h4>
+            <p>L'État verse directement les 50% restants à CleanOcc. Vous n'avancez rien, sans attendre avril.</p>
+          </div>
+        </div>
+
+        <div class="avance-footer">
+          <p class="avance-conditions">
+            <strong>Conditions :</strong> réservé aux <strong>particuliers</strong> pour des prestations à domicile (nettoyage, lavage de vitres…). Non applicable aux professionnels et entreprises.
+            Valable que vous soyez imposable ou non. Disponible via le portail <strong>impots.gouv.fr</strong> ou votre espace CESU.
+          </p>
+          <a href="#contact" class="btn-avance">En profiter – Devis gratuit →</a>
+        </div>
+      </div>
+    </section>
+
     <!-- CONTACT -->
     <section id="contact">
       <header class="section-header">
@@ -1333,9 +1730,10 @@
                 placeholder="Surface approximative, fréquence souhaitée, particularités du lieu…" required></textarea>
             </div>
             <div class="form-full form-actions">
-              <button type="submit" class="btn-primary" style="border:none;cursor:pointer;">Envoyer ma demande de
-                devis</button>
-              <div class="form-helper">Réponse en général sous 24h (hors week-end).</div>
+              <button type="submit" class="btn-primary" style="border:none;cursor:pointer;font-size:0.97rem;padding:14px 30px;width:100%;justify-content:center;">
+                Envoyer ma demande de devis →
+              </button>
+              <div class="form-helper" style="width:100%;text-align:center;">🔒 Réponse garantie sous 24h (hors week-end) · Devis gratuit et sans engagement.</div>
             </div>
             <div id="devis-form-status" class="form-status form-full" role="status" aria-live="polite"></div>
           </form>
@@ -1464,6 +1862,10 @@
           <div class="faq-a">Les tarifs dépendent principalement du type de prestation, de la surface approximative, de
             l’état des lieux et de la fréquence (ponctuelle ou régulière). Après votre demande, nous vous envoyons un
             devis clair, sans surprise.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Puis-je bénéficier de l’avance immédiate de crédit d’impôt ?</div>
+          <div class="faq-a">Oui, si vous êtes un <strong>particulier</strong>. L’avance immédiate de crédit d’impôt vous permet de ne payer que 50 % de la facture au moment de la prestation — l’État verse directement les 50 % restants à CleanOcc. Ce dispositif est accessible via votre espace personnel sur <strong>impots.gouv.fr</strong>, que vous soyez imposable ou non. <strong>Attention : ce dispositif ne s’applique pas aux professionnels et entreprises.</strong></div>
         </div>
       </div>
     </section>
