@@ -48,13 +48,13 @@ async function getUrssafToken() {
 
 async function urssafRequest(method, path, body) {
   const token = await getUrssafToken();
-  const opts = {
-    method,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
   };
+  if (URSSAF.siret) headers['X-Siret-Prestataire'] = URSSAF.siret;
+
+  const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
 
   const res = await fetch(`${URSSAF.apiBase}${path}`, opts);
