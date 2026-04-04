@@ -1669,63 +1669,12 @@
           <p>Un nettoyage à 100 € vous revient à 50 €. Immédiatement, sans avance de trésorerie.</p>
         </div>
       </div>
-      <!-- Formulaire Avance Immédiate -->
-      <form id="avance-form" class="avance-form" autocomplete="on">
-        <h3 style="margin-bottom:16px;font-size:1.05rem;">Bénéficier de l'Avance Immédiate</h3>
-        <div class="avance-form-grid">
-          <div>
-            <label for="ai-prenom">Prénom *</label>
-            <input type="text" id="ai-prenom" name="prenom" required />
-          </div>
-          <div>
-            <label for="ai-nom">Nom *</label>
-            <input type="text" id="ai-nom" name="nom" required />
-          </div>
-          <div>
-            <label for="ai-email">Email *</label>
-            <input type="email" id="ai-email" name="email" required />
-          </div>
-          <div>
-            <label for="ai-telephone">Téléphone *</label>
-            <input type="tel" id="ai-telephone" name="telephone" required />
-          </div>
-          <div>
-            <label for="ai-adresse">Adresse du domicile *</label>
-            <input type="text" id="ai-adresse" name="adresse" required />
-          </div>
-          <div>
-            <label for="ai-ville">Ville *</label>
-            <input type="text" id="ai-ville" name="ville" required />
-          </div>
-          <div>
-            <label for="ai-cp">Code postal *</label>
-            <input type="text" id="ai-cp" name="codePostal" pattern="[0-9]{5}" required />
-          </div>
-          <div>
-            <label for="ai-prestation">Type de prestation *</label>
-            <select id="ai-prestation" name="prestation" required>
-              <option value="">Choisir…</option>
-              <option value="menage-domicile">Ménage à domicile</option>
-              <option value="nettoyage-vitres-domicile">Nettoyage de vitres à domicile</option>
-              <option value="repassage">Repassage</option>
-              <option value="grand-menage">Grand ménage / ménage de printemps</option>
-            </select>
-          </div>
-          <div>
-            <label for="ai-montant">Montant TTC estimé (€) *</label>
-            <input type="number" id="ai-montant" name="montantTTC" min="1" step="0.01" required />
-          </div>
-          <div>
-            <label for="ai-date">Date souhaitée *</label>
-            <input type="date" id="ai-date" name="datePrestation" required />
-          </div>
-        </div>
-        <div style="margin-top:8px;font-size:0.84rem;color:#64748b;">
-          Montant à votre charge : <strong id="ai-reste" style="color:#166534;">0,00 €</strong> (50% pris en charge par l'État)
-        </div>
-        <button type="submit" class="btn-primary" style="margin-top:20px;">Envoyer ma demande – Avance Immédiate</button>
-        <div id="avance-status" aria-live="polite" style="margin-top:12px;font-size:0.88rem;"></div>
-      </form>
+      <div class="avance-footer">
+        <p class="avance-conditions">
+          <strong>Conditions :</strong> réservé aux <strong>particuliers</strong> pour des prestations à domicile. Non applicable aux professionnels. Valable imposable ou non.
+        </p>
+        <a href="#contact" class="btn-avance">En profiter – Devis gratuit →</a>
+      </div>
     </section>
 
     <!-- ZONES -->

@@ -52,7 +52,6 @@ async function urssafRequest(method, path, body) {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
-  if (URSSAF.siret) headers['X-Siret-Prestataire'] = URSSAF.siret;
 
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
@@ -189,6 +188,18 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
     return res.status(503).json({ error: 'API URSSAF non configurée.' });
   }
 
+  // Sauvegarde locale avant appel URSSAF
+  const stmtInsert = db.prepare(`
+    INSERT INTO avance_immediate (nom, prenom, email, telephone, adresse, ville, code_postal, prestation, montant_ttc, date_prestation, statut)
+    VALUES (?, ?, ?, ?, ?, ?, ?, '', 0, '', 'en_attente')
+  `);
+  const localRow = stmtInsert.run(
+    String(nom).trim(), String(prenom).trim(), String(email).trim(),
+    String(telephone).trim(), String(adresse).trim(), String(ville).trim(),
+    String(codePostal).trim()
+  );
+  const localId = Number(localRow.lastInsertRowid);
+
   try {
     const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/particuliers', {
       civilite: 'M',
@@ -204,13 +215,16 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
       siretPrestataire: URSSAF.siret,
     });
 
-    res.status(200).json({
-      ok: result.status === 200 || result.status === 201,
-      urssaf_status: result.status,
-      urssaf: result.data,
-    });
+    const ok = result.status === 200 || result.status === 201;
+    const statut = ok ? 'urssaf_ok' : 'urssaf_erreur';
+    db.prepare('UPDATE avance_immediate SET statut = ?, urssaf_response = ? WHERE id = ?')
+      .run(statut, JSON.stringify(result.data), localId);
+
+    res.status(200).json({ ok, id: localId, urssaf: result.data });
   } catch (err) {
     console.error('URSSAF inscription error:', err.message);
+    db.prepare('UPDATE avance_immediate SET statut = ? WHERE id = ?')
+      .run('erreur_reseau', localId);
     res.status(500).json({ error: 'Erreur de communication avec l\'URSSAF.', detail: err.message });
   }
 });
