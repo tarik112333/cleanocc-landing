@@ -3,10 +3,53 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const Database = require('better-sqlite3');
 const { Resend } = require('resend');
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+// --- AIRTABLE ---
+const AIRTABLE_KEY = process.env.AIRTABLE_KEY;
+const AIRTABLE_BASE = process.env.AIRTABLE_BASE;
+const AIRTABLE_TABLE_DEVIS = process.env.AIRTABLE_TABLE_DEVIS;
+const AIRTABLE_TABLE_AVANCE = process.env.AIRTABLE_TABLE_AVANCE;
+
+async function airtableInsert(tableId, fields) {
+  const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(JSON.stringify(data));
+  return data;
+}
+
+async function airtableUpdate(tableId, recordId, fields) {
+  const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}/${recordId}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(JSON.stringify(data));
+  return data;
+}
+
+async function airtableList(tableId) {
+  const res = await fetch(
+    `https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}?sort[0][field]=Date&sort[0][direction]=desc&maxRecords=500`,
+    { headers: { 'Authorization': `Bearer ${AIRTABLE_KEY}` } }
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(JSON.stringify(data));
+  return data.records;
+}
 
 // --- URSSAF Avance Immédiate ---
 const URSSAF = {
@@ -46,7 +89,7 @@ async function getUrssafToken() {
   return urssafToken;
 }
 
-async function urssafRequest(method, path, body) {
+async function urssafRequest(method, urlPath, body) {
   const token = await getUrssafToken();
   const headers = {
     'Authorization': `Bearer ${token}`,
@@ -56,7 +99,7 @@ async function urssafRequest(method, path, body) {
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
 
-  const res = await fetch(`${URSSAF.apiBase}${path}`, opts);
+  const res = await fetch(`${URSSAF.apiBase}${urlPath}`, opts);
   const text = await res.text();
   let data;
   try { data = JSON.parse(text); } catch { data = { _raw: text.slice(0, 300) }; }
@@ -66,48 +109,6 @@ async function urssafRequest(method, path, body) {
 
 // --- CONFIG ---
 const PORT = Number(process.env.PORT) || 3000;
-const DATA_DIR = path.join(__dirname, 'data');
-const DB_PATH = path.join(DATA_DIR, 'devis.db');
-
-// --- CRÉATION DU DOSSIER DATA ---
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// --- BASE DE DONNÉES ---
-const db = new Database(DB_PATH);
-db.exec(`
-  CREATE TABLE IF NOT EXISTS devis_requests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT,
-    phone TEXT NOT NULL,
-    city TEXT NOT NULL,
-    service TEXT NOT NULL,
-    message TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  );
-`);
-
-// --- TABLE AVANCE IMMÉDIATE ---
-db.exec(`
-  CREATE TABLE IF NOT EXISTS avance_immediate (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom TEXT NOT NULL,
-    prenom TEXT NOT NULL,
-    email TEXT NOT NULL,
-    telephone TEXT NOT NULL,
-    adresse TEXT NOT NULL,
-    ville TEXT NOT NULL,
-    code_postal TEXT NOT NULL,
-    prestation TEXT NOT NULL,
-    montant_ttc REAL NOT NULL,
-    date_prestation TEXT NOT NULL,
-    statut TEXT NOT NULL DEFAULT 'en_attente',
-    urssaf_response TEXT,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  );
-`);
 
 // --- APP ---
 const app = express();
@@ -132,47 +133,47 @@ app.get('/', (req, res) => {
 });
 
 // --- API : POST devis ---
-app.post('/api/devis', (req, res) => {
+app.post('/api/devis', async (req, res) => {
   const { name, email, phone, city, service, message } = req.body || {};
 
   if (!name || !phone || !city || !service || !message) {
     return res.status(400).json({ error: 'Champs obligatoires manquants.' });
   }
 
-  const stmt = db.prepare(`
-    INSERT INTO devis_requests (name, email, phone, city, service, message)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
+  try {
+    const record = await airtableInsert(AIRTABLE_TABLE_DEVIS, {
+      'Nom': String(name).trim(),
+      'Email': email ? String(email).trim() : '',
+      'Téléphone': String(phone).trim(),
+      'Ville': String(city).trim(),
+      'Prestation': String(service).trim(),
+      'Message': String(message).trim(),
+      'Date': new Date().toISOString(),
+    });
 
-  const result = stmt.run(
-    String(name).trim(),
-    email ? String(email).trim() : '',
-    String(phone).trim(),
-    String(city).trim(),
-    String(service).trim(),
-    String(message).trim()
-  );
+    res.status(201).json({ ok: true, id: record.id });
 
-  res.status(201).json({ ok: true, id: Number(result.lastInsertRowid) });
-
-  // Envoi email de notification
-  if (resend && process.env.NOTIFY_EMAIL) {
-    resend.emails.send({
-      from: 'CleanOcc <onboarding@resend.dev>',
-      to: process.env.NOTIFY_EMAIL,
-      subject: `Nouvelle demande de devis – ${String(name).trim()}`,
-      html: `
-        <h2>Nouvelle demande de devis CleanOcc</h2>
-        <table>
-          <tr><td><strong>Nom</strong></td><td>${String(name).trim()}</td></tr>
-          <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
-          <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
-          <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
-          <tr><td><strong>Prestation</strong></td><td>${String(service).trim()}</td></tr>
-          <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
-        </table>
-      `
-    }).catch(err => console.error('Resend error:', err));
+    if (resend && process.env.NOTIFY_EMAIL) {
+      resend.emails.send({
+        from: 'CleanOcc <noreply@cleanocc.fr>',
+        to: process.env.NOTIFY_EMAIL,
+        subject: `Nouvelle demande de devis – ${String(name).trim()}`,
+        html: `
+          <h2>Nouvelle demande de devis CleanOcc</h2>
+          <table>
+            <tr><td><strong>Nom</strong></td><td>${String(name).trim()}</td></tr>
+            <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
+            <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
+            <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
+            <tr><td><strong>Prestation</strong></td><td>${String(service).trim()}</td></tr>
+            <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
+          </table>
+        `
+      }).catch(err => console.error('Resend error:', err));
+    }
+  } catch (err) {
+    console.error('Airtable devis error:', err.message);
+    res.status(500).json({ error: 'Erreur lors de la sauvegarde de la demande.' });
   }
 });
 
@@ -190,17 +191,24 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
     return res.status(503).json({ error: 'API URSSAF non configurée.' });
   }
 
-  // Sauvegarde locale avant appel URSSAF
-  const stmtInsert = db.prepare(`
-    INSERT INTO avance_immediate (nom, prenom, email, telephone, adresse, ville, code_postal, prestation, montant_ttc, date_prestation, statut)
-    VALUES (?, ?, ?, ?, ?, ?, ?, '', 0, '', 'en_attente')
-  `);
-  const localRow = stmtInsert.run(
-    String(nom).trim(), String(prenom).trim(), String(email).trim(),
-    String(telephone).trim(), String(adresse).trim(), String(ville).trim(),
-    String(codePostal).trim()
-  );
-  const localId = Number(localRow.lastInsertRowid);
+  let recordId;
+  try {
+    const record = await airtableInsert(AIRTABLE_TABLE_AVANCE, {
+      'Nom': String(nom).trim(),
+      'Prénom': String(prenom).trim(),
+      'Email': String(email).trim(),
+      'Téléphone': String(telephone).trim(),
+      'Adresse': String(adresse).trim(),
+      'Ville': String(ville).trim(),
+      'Code Postal': String(codePostal).trim(),
+      'Statut': 'en_attente',
+      'Date': new Date().toISOString(),
+    });
+    recordId = record.id;
+  } catch (err) {
+    console.error('Airtable insert error:', err.message);
+    return res.status(500).json({ error: 'Erreur lors de la sauvegarde.' });
+  }
 
   try {
     const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/particuliers', {
@@ -222,15 +230,15 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
     });
 
     const ok = result.status === 200 || result.status === 201;
-    const statut = ok ? 'urssaf_ok' : 'urssaf_erreur';
-    db.prepare('UPDATE avance_immediate SET statut = ?, urssaf_response = ? WHERE id = ?')
-      .run(statut, JSON.stringify(result.data), localId);
+    await airtableUpdate(AIRTABLE_TABLE_AVANCE, recordId, {
+      'Statut': ok ? 'urssaf_ok' : 'urssaf_erreur',
+      'Réponse URSSAF': JSON.stringify(result.data),
+    });
 
-    res.status(200).json({ ok, id: localId, urssaf: result.data });
+    res.status(200).json({ ok, id: recordId, urssaf: result.data });
   } catch (err) {
     console.error('URSSAF inscription error:', err.message);
-    db.prepare('UPDATE avance_immediate SET statut = ? WHERE id = ?')
-      .run('erreur_reseau', localId);
+    await airtableUpdate(AIRTABLE_TABLE_AVANCE, recordId, { 'Statut': 'erreur_reseau' }).catch(() => {});
     res.status(500).json({ error: 'Erreur de communication avec l\'URSSAF.', detail: err.message });
   }
 });
@@ -251,18 +259,27 @@ app.post('/api/avance-immediate/paiement', async (req, res) => {
     return res.status(503).json({ error: 'API URSSAF non configurée.' });
   }
 
-  // Sauvegarde locale
-  const stmt = db.prepare(`
-    INSERT INTO avance_immediate (nom, prenom, email, telephone, adresse, ville, code_postal, prestation, montant_ttc, date_prestation, statut)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'envoyee')
-  `);
-  const row = stmt.run(
-    String(nom).trim(), String(prenom).trim(), String(email).trim(),
-    String(telephone).trim(), String(adresse).trim(), String(ville).trim(),
-    String(codePostal).trim(), String(prestation).trim(),
-    Number(montantTTC), String(datePrestation).trim()
-  );
-  const localId = Number(row.lastInsertRowid);
+  let recordId;
+  try {
+    const record = await airtableInsert(AIRTABLE_TABLE_AVANCE, {
+      'Nom': String(nom).trim(),
+      'Prénom': String(prenom).trim(),
+      'Email': String(email).trim(),
+      'Téléphone': String(telephone).trim(),
+      'Adresse': String(adresse).trim(),
+      'Ville': String(ville).trim(),
+      'Code Postal': String(codePostal).trim(),
+      'Prestation': String(prestation).trim(),
+      'Montant TTC': Number(montantTTC),
+      'Date Prestation': String(datePrestation).trim(),
+      'Statut': 'en_attente',
+      'Date': new Date().toISOString(),
+    });
+    recordId = record.id;
+  } catch (err) {
+    console.error('Airtable insert error:', err.message);
+    return res.status(500).json({ error: 'Erreur lors de la sauvegarde.' });
+  }
 
   try {
     const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/demandesPaiement', {
@@ -280,27 +297,25 @@ app.post('/api/avance-immediate/paiement', async (req, res) => {
       },
     });
 
-    // Mise à jour statut
-    const statut = (result.status === 200 || result.status === 201) ? 'acceptee' : 'erreur_urssaf';
-    db.prepare('UPDATE avance_immediate SET statut = ?, urssaf_response = ? WHERE id = ?')
-      .run(statut, JSON.stringify(result.data), localId);
-
-    res.status(result.status === 200 || result.status === 201 ? 201 : result.status).json({
-      ok: result.status === 200 || result.status === 201,
-      id: localId,
-      urssaf: result.data,
+    const ok = result.status === 200 || result.status === 201;
+    await airtableUpdate(AIRTABLE_TABLE_AVANCE, recordId, {
+      'Statut': ok ? 'urssaf_ok' : 'urssaf_erreur',
+      'Réponse URSSAF': JSON.stringify(result.data),
     });
+
+    res.status(ok ? 201 : result.status).json({ ok, id: recordId, urssaf: result.data });
   } catch (err) {
     console.error('URSSAF paiement error:', err.message);
-    db.prepare('UPDATE avance_immediate SET statut = ?, urssaf_response = ? WHERE id = ?')
-      .run('erreur_reseau', err.message, localId);
-    res.status(500).json({ error: 'Erreur de communication avec l\'URSSAF.', detail: err.message, id: localId });
+    await airtableUpdate(AIRTABLE_TABLE_AVANCE, recordId, {
+      'Statut': 'erreur_reseau',
+      'Réponse URSSAF': err.message,
+    }).catch(() => {});
+    res.status(500).json({ error: 'Erreur de communication avec l\'URSSAF.', detail: err.message, id: recordId });
   }
 
-  // Notification email
   if (resend && process.env.NOTIFY_EMAIL) {
     resend.emails.send({
-      from: 'CleanOcc <onboarding@resend.dev>',
+      from: 'CleanOcc <noreply@cleanocc.fr>',
       to: process.env.NOTIFY_EMAIL,
       subject: `Avance Immédiate – ${String(prenom).trim()} ${String(nom).trim()}`,
       html: `
@@ -322,7 +337,7 @@ app.post('/api/avance-immediate/paiement', async (req, res) => {
 // --- API : GET devis (admin) ---
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
-app.get('/api/devis', (req, res) => {
+app.get('/api/devis', async (req, res) => {
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
 
@@ -330,11 +345,12 @@ app.get('/api/devis', (req, res) => {
     return res.status(401).json({ error: 'Non autorisé.' });
   }
 
-  const rows = db.prepare(
-    'SELECT id, name, email, phone, city, service, message, created_at FROM devis_requests ORDER BY id DESC LIMIT 500'
-  ).all();
-
-  res.json(rows);
+  try {
+    const records = await airtableList(AIRTABLE_TABLE_DEVIS);
+    res.json(records.map(r => ({ id: r.id, ...r.fields })));
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur Airtable.', detail: err.message });
+  }
 });
 
 // --- SERVER ---
