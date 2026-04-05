@@ -1232,6 +1232,12 @@
       color: #991b1b;
     }
 
+    .form-status--info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+    }
+
     button[type="submit"]:disabled {
       opacity: 0.65;
       cursor: not-allowed;
@@ -2089,7 +2095,8 @@
 
       function showStatus(kind, text) {
         statusEl.textContent = text;
-        statusEl.className = ‘form-status form-full is-visible ‘ + (kind === ‘success’ ? ‘form-status--success’ : ‘form-status--error’);
+        statusEl.className = ‘form-status form-full is-visible ‘ + (kind === ‘success’ ? ‘form-status--success’ : kind === ‘info’ ? ‘form-status--info’ : ‘form-status--error’);
+        statusEl.scrollIntoView({ behavior: ‘smooth’, block: ‘nearest’ });
       }
 
       function hideStatus() {
@@ -2122,6 +2129,7 @@
 
         btn.disabled = true;
         btn.textContent = ‘Envoi en cours…’;
+        showStatus(‘info’, ‘⏳ Envoi en cours, merci de patienter…’);
 
         const apiBase = (function () {
           const meta = document.querySelector(‘meta[name="cleanocc-api-origin"]’);
