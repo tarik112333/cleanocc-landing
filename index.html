@@ -1729,15 +1729,39 @@
               <div class="avance-extra-inner">
                 <div class="avance-extra-label">Informations pour l’avance immédiate (URSSAF)</div>
                 <div class="avance-extra-grid">
-                  <div class="form-full" style="grid-column:1/-1">
-                    <label for="adresse">Adresse *</label>
+                  <div>
+                    <label for="ai-civilite">Civilité *</label>
+                    <select id="ai-civilite" name="civilite">
+                      <option value="M">M.</option>
+                      <option value="MME">Mme</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="ai-dateNaissance">Date de naissance *</label>
+                    <input type="date" id="ai-dateNaissance" name="dateNaissance" />
+                  </div>
+                  <div>
+                    <label for="ai-communeNaissance">Commune de naissance *</label>
+                    <input type="text" id="ai-communeNaissance" name="communeNaissance" placeholder="ex : Toulouse" />
+                  </div>
+                  <div>
+                    <label for="ai-paysNaissance">Pays de naissance *</label>
+                    <input type="text" id="ai-paysNaissance" name="paysNaissance" placeholder="ex : France" value="France" />
+                  </div>
+                  <div style="grid-column:1/-1">
+                    <label for="adresse">Adresse fiscale *</label>
                     <input type="text" id="adresse" name="adresse" placeholder="Numéro et nom de rue" />
                   </div>
                   <div>
                     <label for="codePostal">Code postal *</label>
                     <input type="text" id="codePostal" name="codePostal" placeholder="31000" />
                   </div>
+                  <div>
+                    <label for="ai-iban">IBAN *</label>
+                    <input type="text" id="ai-iban" name="iban" placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" />
+                  </div>
                 </div>
+                <p style="font-size:0.75rem;color:#94a3b8;margin-top:10px;">🔒 Ces informations sont transmises uniquement à l’URSSAF pour activer votre avance immédiate. Non conservées au-delà.</p>
               </div>
             </div>
 
@@ -2024,12 +2048,17 @@
           // Envoi avance immédiate si cochée
           if (avance) {
             const avancePayload = {
+              civilite: (fd.get(‘civilite’) || ‘M’).trim(),
               prenom, nom,
               email: devisPayload.email,
               telephone: devisPayload.phone,
+              dateNaissance: (fd.get(‘dateNaissance’) || ‘’).trim(),
+              communeNaissance: (fd.get(‘communeNaissance’) || ‘’).trim(),
+              paysNaissance: (fd.get(‘paysNaissance’) || ‘France’).trim(),
               adresse: (fd.get(‘adresse’) || ‘’).trim(),
               codePostal: (fd.get(‘codePostal’) || ‘’).trim(),
               ville: devisPayload.city,
+              iban: (fd.get(‘iban’) || ‘’).trim(),
             };
             try {
               await fetch(apiBase + ‘/api/avance-immediate/inscription’, {
