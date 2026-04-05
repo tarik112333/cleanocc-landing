@@ -178,9 +178,11 @@ app.post('/api/devis', (req, res) => {
 
 // --- API : Avance Immédiate – Inscription particulier ---
 app.post('/api/avance-immediate/inscription', async (req, res) => {
-  const { nom, prenom, email, telephone, adresse, ville, codePostal } = req.body || {};
+  const { nom, prenom, email, telephone, adresse, ville, codePostal,
+          civilite, dateNaissance, communeNaissance, paysNaissance, iban } = req.body || {};
 
-  if (!nom || !prenom || !email || !telephone || !adresse || !ville || !codePostal) {
+  if (!nom || !prenom || !email || !telephone || !adresse || !ville || !codePostal
+      || !dateNaissance || !communeNaissance || !iban) {
     return res.status(400).json({ error: 'Tous les champs sont obligatoires.' });
   }
 
@@ -202,11 +204,15 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
 
   try {
     const result = await urssafRequest('POST', '/atp/v1/tiersPrestations/particuliers', {
-      civilite: 'M',
+      civilite: String(civilite || 'M').trim(),
       nom: String(nom).trim(),
       prenom: String(prenom).trim(),
       email: String(email).trim(),
       telephone: String(telephone).trim(),
+      dateNaissance: String(dateNaissance).trim(),
+      communeNaissance: String(communeNaissance).trim().toUpperCase(),
+      paysNaissance: String(paysNaissance || 'France').trim().toUpperCase(),
+      iban: String(iban).replace(/\s/g, '').toUpperCase(),
       adresse: {
         ligne1: String(adresse).trim(),
         codePostal: String(codePostal).trim(),
