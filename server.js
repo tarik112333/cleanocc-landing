@@ -13,6 +13,16 @@ const AIRTABLE_BASE = process.env.AIRTABLE_BASE;
 const AIRTABLE_TABLE_DEVIS = process.env.AIRTABLE_TABLE_DEVIS;
 const AIRTABLE_TABLE_AVANCE = process.env.AIRTABLE_TABLE_AVANCE;
 
+function airtableDevisConfigured() {
+  return Boolean(AIRTABLE_KEY && AIRTABLE_BASE && AIRTABLE_TABLE_DEVIS);
+}
+
+if (!airtableDevisConfigured()) {
+  console.warn(
+    '[CleanOcc] Airtable devis non configuré : définissez AIRTABLE_KEY, AIRTABLE_BASE et AIRTABLE_TABLE_DEVIS dans .env (ou les variables d’environnement sur Render / votre hébergeur).'
+  );
+}
+
 async function airtableInsert(tableId, fields) {
   const res = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${tableId}`, {
     method: 'POST',
@@ -112,8 +122,19 @@ const PORT = Number(process.env.PORT) || 3000;
 
 // --- APP ---
 const app = express();
+app.set('trust proxy', true);
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: '100kb' }));
+
+// Santé de l’API (test CORS / disponibilité depuis le navigateur)
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, service: 'cleanocc-api' });
+});
+
+// --- FICHIERS STATIQUES (app.js, etc.) ---
+app.get('/app.js', (req, res) => {
+  res.type('js').sendFile(path.join(__dirname, 'app.js'));
+});
 
 // --- ROUTE HTML ---
 app.get('/', (req, res) => {
@@ -121,11 +142,13 @@ app.get('/', (req, res) => {
   let html = fs.readFileSync(htmlPath, 'utf8');
 
   const host = req.get('host') || `localhost:${PORT}`;
-  const proto = req.protocol === 'https' ? 'https' : 'http';
+  const isProduction = host.includes('cleanocc.fr');
+  const proto = isProduction ? 'https' : req.protocol;
   const origin = `${proto}://${host}`;
 
+  // Toujours forcer l’origine API sur l’hôte actuel (siné meta figée = formulaire vers Render, .env local ignoré).
   html = html.replace(
-    /<meta name="cleanocc-api-origin" content="" \/>/,
+    /<meta name="cleanocc-api-origin" content="[^"]*" \/>/,
     `<meta name="cleanocc-api-origin" content="${origin}" />`
   );
 
@@ -138,6 +161,13 @@ app.post('/api/devis', async (req, res) => {
 
   if (!name || !phone || !city || !service || !message) {
     return res.status(400).json({ error: 'Champs obligatoires manquants.' });
+  }
+
+  if (!airtableDevisConfigured()) {
+    console.error('POST /api/devis refusé : variables Airtable manquantes.');
+    return res.status(503).json({
+      error: 'Service temporairement indisponible : la base de données des demandes n’est pas configurée sur le serveur.',
+    });
   }
 
   try {
@@ -343,6 +373,10 @@ app.get('/api/devis', async (req, res) => {
 
   if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
     return res.status(401).json({ error: 'Non autorisé.' });
+  }
+
+  if (!airtableDevisConfigured()) {
+    return res.status(503).json({ error: 'Airtable non configuré pour les devis.' });
   }
 
   try {

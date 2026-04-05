@@ -32,7 +32,7 @@
   <meta name="twitter:description"
     content="Lavage de vitres, nettoyage de bureaux, fin de location à Toulouse. Note 4,6/5 · Devis gratuit." />
   <!-- Si le site est servi ailleurs que sur le même serveur que l’API, indiquez l’origine (ex. http://localhost:3000) -->
-  <meta name="cleanocc-api-origin" content="" />
+  <meta name="cleanocc-api-origin" content="https://cleanocc-landing.onrender.com" />
 
   <!-- Données structurées JSON-LD -->
   <script type="application/ld+json">
@@ -1989,172 +1989,220 @@
   </footer>
 
   <script>
-    document.querySelectorAll('.faq-q').forEach(q => {
-      q.addEventListener('click', () => {
-        const item = q.closest('.faq-item');
-        const isOpen = item.classList.contains('open');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-        if (!isOpen) item.classList.add('open');
+document.querySelectorAll('.faq-q').forEach(function (q) {
+  q.addEventListener('click', function () {
+    var item = q.closest('.faq-item');
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(function (i) { i.classList.remove('open'); });
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+(function () {
+  var RENDER_API_ORIGIN = 'https://cleanocc-landing.onrender.com';
+  var RENDER_DEVIS_URL = RENDER_API_ORIGIN + '/api/devis';
+
+  function pageHostname() {
+    return window.location.hostname;
+  }
+
+  function bareHost(h) {
+    return String(h || '').replace(/^www\./i, '').toLowerCase();
+  }
+
+  function isLocalDev() {
+    var h = pageHostname();
+    return h === 'localhost' || h === '127.0.0.1';
+  }
+
+  /** URLs à essayer dans l’ordre : d’abord l’API locale si dispo, puis meta externe, puis Render. */
+  function devisPostUrls() {
+    var out = [];
+    var seen = {};
+    var push = function (u) {
+      if (!u || seen[u]) return;
+      seen[u] = true;
+      out.push(u);
+    };
+
+    if (window.location.protocol === 'file:') {
+      push(RENDER_DEVIS_URL);
+      return out;
+    }
+
+    if (isLocalDev()) {
+      var port = window.location.port;
+      if (!port || port === '3000') push('/api/devis');
+    }
+
+    var meta = document.querySelector('meta[name="cleanocc-api-origin"]');
+    var raw = meta && meta.getAttribute('content');
+    if (raw && String(raw).trim()) {
+      try {
+        var base = String(raw).trim().replace(/\/+$/, '');
+        var apiUrl = base + '/api/devis';
+        var metaHost = new URL(base.indexOf('//') === -1 ? 'https://' + base : base).hostname;
+        if (bareHost(metaHost) !== bareHost(pageHostname())) push(apiUrl);
+      } catch (e) { /* meta invalide */ }
+    }
+
+    push(RENDER_DEVIS_URL);
+    return out;
+  }
+
+  function apiBaseForAvance() {
+    var meta = document.querySelector('meta[name="cleanocc-api-origin"]');
+    var raw = meta && meta.getAttribute('content');
+    if (raw && String(raw).trim()) {
+      try {
+        var base = String(raw).trim().replace(/\/+$/, '');
+        var metaHost = new URL(base.indexOf('//') === -1 ? 'https://' + base : base).hostname;
+        if (bareHost(metaHost) !== bareHost(pageHostname())) return base;
+      } catch (e) { /* ignore */ }
+    }
+    if (window.location.protocol === 'file:') return RENDER_API_ORIGIN;
+    if (isLocalDev()) {
+      var port = window.location.port;
+      if (!port || port === '3000') return window.location.origin.replace(/\/+$/, '');
+    }
+    return RENDER_API_ORIGIN;
+  }
+
+  // Toggle avance immediate extra fields
+  var toggle = document.getElementById('avance-toggle');
+  var avanceExtra = document.getElementById('avance-extra');
+  if (toggle && avanceExtra) {
+    toggle.addEventListener('change', function () {
+      avanceExtra.style.display = this.checked ? 'block' : 'none';
+      avanceExtra.querySelectorAll('input').forEach(function (inp) {
+        inp.required = toggle.checked;
       });
     });
+  }
 
-    (function () {
-      function devisApiUrl() {
-        var meta = document.querySelector('meta[name="cleanocc-api-origin"]');
-        var explicit = meta && meta.getAttribute('content');
-        if (explicit && String(explicit).trim()) {
-          return String(explicit).replace(/\/+$/, '') + '/api/devis';
-        }
-        if (window.location.protocol === 'file:') {
-          return 'https://cleanocc-landing.onrender.com/api/devis';
-        }
-        var host = window.location.hostname;
-        var port = window.location.port;
-        if (host === 'localhost' || host === '127.0.0.1') {
-          if (port && port !== '3000') {
-            return 'https://cleanocc-landing.onrender.com/api/devis';
-          }
-        }
-        return '/api/devis';
-      }
+  var form = document.getElementById('devis-form');
+  var statusEl = document.getElementById('devis-form-status');
+  if (!form || !statusEl) return;
 
-      function devisApiFallbackUrls(primary) {
-        var list = [
-          primary,
-          'https://cleanocc-landing.onrender.com/api/devis'
-        ];
-        var seen = {};
-        return list.filter(function (u) {
-          if (seen[u]) return false;
-          seen[u] = true;
-          return true;
-        });
-      }
+  function showStatus(kind, text) {
+    statusEl.textContent = text;
+    statusEl.className = 'form-status form-full is-visible ' + (kind === 'success' ? 'form-status--success' : kind === 'info' ? 'form-status--info' : 'form-status--error');
+    statusEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 
-      // Toggle avance immédiate extra fields
-      const toggle = document.getElementById(‘avance-toggle’);
-      const avanceExtra = document.getElementById(‘avance-extra’);
-      if (toggle && avanceExtra) {
-        toggle.addEventListener(‘change’, function () {
-          avanceExtra.style.display = this.checked ? ‘block’ : ‘none’;
-          avanceExtra.querySelectorAll(‘input’).forEach(function (inp) {
-            inp.required = toggle.checked;
-          });
-        });
-      }
+  function hideStatus() {
+    statusEl.className = 'form-status form-full';
+    statusEl.textContent = '';
+  }
 
-      const form = document.getElementById(‘devis-form’);
-      const statusEl = document.getElementById(‘devis-form-status’);
-      if (!form || !statusEl) return;
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    hideStatus();
+    var btn = form.querySelector('button[type="submit"]');
+    var fd = new FormData(form);
+    var prenom = (fd.get('prenom') || '').trim();
+    var nom = (fd.get('nom') || '').trim();
+    var avance = toggle && toggle.checked;
 
-      function showStatus(kind, text) {
-        statusEl.textContent = text;
-        statusEl.className = ‘form-status form-full is-visible ‘ + (kind === ‘success’ ? ‘form-status--success’ : kind === ‘info’ ? ‘form-status--info’ : ‘form-status--error’);
-        statusEl.scrollIntoView({ behavior: ‘smooth’, block: ‘nearest’ });
-      }
+    var devisPayload = {
+      name: (prenom + ' ' + nom).trim(),
+      email: (fd.get('email') || '').trim(),
+      phone: (fd.get('phone') || '').trim(),
+      city: (fd.get('city') || '').trim(),
+      service: (fd.get('service') || '').trim(),
+      message: (fd.get('message') || '').trim()
+    };
 
-      function hideStatus() {
-        statusEl.className = ‘form-status form-full’;
-        statusEl.textContent = ‘’;
-      }
+    if (!devisPayload.name || !devisPayload.phone || !devisPayload.city || !devisPayload.service || !devisPayload.message) {
+      showStatus('error', 'Merci de remplir tous les champs obligatoires.');
+      return;
+    }
 
-      form.addEventListener(‘submit’, async function (e) {
-        e.preventDefault();
-        hideStatus();
-        const btn = form.querySelector(‘button[type="submit"]’);
-        const fd = new FormData(form);
-        const prenom = (fd.get(‘prenom’) || ‘’).trim();
-        const nom = (fd.get(‘nom’) || ‘’).trim();
-        const avance = toggle && toggle.checked;
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours...';
+    showStatus('info', 'Envoi en cours (le serveur peut mettre ~1 min au premier essai)…');
 
-        const devisPayload = {
-          name: (prenom + ‘ ‘ + nom).trim(),
-          email: (fd.get(‘email’) || ‘’).trim(),
-          phone: (fd.get(‘phone’) || ‘’).trim(),
-          city: (fd.get(‘city’) || ‘’).trim(),
-          service: (fd.get(‘service’) || ‘’).trim(),
-          message: (fd.get(‘message’) || ‘’).trim()
-        };
+    var apiBase = apiBaseForAvance();
+    var urls = devisPostUrls();
 
-        if (!devisPayload.name || !devisPayload.phone || !devisPayload.city || !devisPayload.service || !devisPayload.message) {
-          showStatus(‘error’, ‘Merci de remplir tous les champs obligatoires.’);
-          return;
-        }
-
-        btn.disabled = true;
-        btn.textContent = ‘Envoi en cours…’;
-        showStatus(‘info’, ‘⏳ Envoi en cours, merci de patienter…’);
-
-        const apiBase = (function () {
-          const meta = document.querySelector(‘meta[name="cleanocc-api-origin"]’);
-          const explicit = meta && meta.getAttribute(‘content’);
-          if (explicit && explicit.trim()) return explicit.replace(/\/+$/, ‘’);
-          if (window.location.protocol === ‘file:’) return ‘https://cleanocc-landing.onrender.com’;
-          return ‘’;
-        })();
-
+    try {
+      var res = null, data = {};
+      var lastNetErr = null;
+      for (var i = 0; i < urls.length; i++) {
         try {
-          // Envoi devis
-          var primary = devisApiUrl();
-          var urls = devisApiFallbackUrls(primary);
-          var res = null, data = {};
-          for (var i = 0; i < urls.length; i++) {
-            try {
-              res = await fetch(urls[i], {
-                method: ‘POST’,
-                headers: { ‘Content-Type’: ‘application/json’, Accept: ‘application/json’ },
-                body: JSON.stringify(devisPayload)
-              });
-              data = await res.json().catch(function () { return {}; });
-              if (res.ok) break;
-              if (res.status === 400 && data.error) break;
-              res = null;
-            } catch (err) { res = null; }
+          var attempt = await fetch(urls[i], {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(devisPayload),
+            mode: 'cors',
+            cache: 'no-store'
+          });
+          var parsed = await attempt.json().catch(function () { return {}; });
+          if (attempt.status === 400 && parsed && parsed.error) {
+            res = attempt;
+            data = parsed;
+            break;
           }
-
-          if (!res || !res.ok) {
-            showStatus(‘error’, (res && res.status === 400 && data.error) ? data.error : ‘Connexion au serveur impossible. Réessayez dans quelques instants.’);
-            return;
+          if (attempt.ok && parsed && parsed.ok === true) {
+            res = attempt;
+            data = parsed;
+            break;
           }
-
-          // Envoi avance immédiate si cochée
-          if (avance) {
-            const avancePayload = {
-              civilite: (fd.get(‘civilite’) || ‘M’).trim(),
-              prenom, nom,
-              email: devisPayload.email,
-              telephone: devisPayload.phone,
-              dateNaissance: (fd.get(‘dateNaissance’) || ‘’).trim(),
-              communeNaissance: (fd.get(‘communeNaissance’) || ‘’).trim(),
-              paysNaissance: (fd.get(‘paysNaissance’) || ‘France’).trim(),
-              adresse: (fd.get(‘adresse’) || ‘’).trim(),
-              codePostal: (fd.get(‘codePostal’) || ‘’).trim(),
-              ville: devisPayload.city,
-              iban: (fd.get(‘iban’) || ‘’).trim(),
-            };
-            try {
-              await fetch(apiBase + ‘/api/avance-immediate/inscription’, {
-                method: ‘POST’,
-                headers: { ‘Content-Type’: ‘application/json’, Accept: ‘application/json’ },
-                body: JSON.stringify(avancePayload),
-              });
-            } catch (_) {}
-          }
-
-          showStatus(‘success’, avance
-            ? ‘✓ Demande envoyée ! Votre devis et votre inscription à l\’avance immédiate ont bien été enregistrés. Nous vous recontactons rapidement.’
-            : ‘✓ Votre demande a bien été enregistrée. Nous vous recontactons rapidement.’
-          );
-          form.reset();
-          if (avanceExtra) avanceExtra.style.display = ‘none’;
         } catch (err) {
-          showStatus(‘error’, ‘Connexion au serveur impossible. Réessayez dans quelques instants.’);
-        } finally {
-          btn.disabled = false;
-          btn.textContent = ‘Envoyer ma demande →’;
+          lastNetErr = err;
+          res = null;
         }
-      });
-    })();
+      }
+
+      if (res && res.status === 400 && data && data.error) {
+        showStatus('error', data.error);
+        return;
+      }
+      if (!res || !res.ok || !data || data.ok !== true) {
+        var hint = 'Impossible de joindre l’API. Réessayez dans 1 minute (Render se met parfois en veille). Désactivez les bloqueurs de pubs / Brave shields pour onrender.com, ou testez depuis un autre navigateur.';
+        if (lastNetErr && lastNetErr.message) console.warn('CleanOcc formulaire:', lastNetErr.message, urls);
+        showStatus('error', hint);
+        return;
+      }
+
+      if (avance) {
+        var avancePayload = {
+          civilite: (fd.get('civilite') || 'M').trim(),
+          prenom: prenom,
+          nom: nom,
+          email: devisPayload.email,
+          telephone: devisPayload.phone,
+          dateNaissance: (fd.get('dateNaissance') || '').trim(),
+          communeNaissance: (fd.get('communeNaissance') || '').trim(),
+          paysNaissance: (fd.get('paysNaissance') || 'France').trim(),
+          adresse: (fd.get('adresse') || '').trim(),
+          codePostal: (fd.get('codePostal') || '').trim(),
+          ville: devisPayload.city,
+          iban: (fd.get('iban') || '').trim()
+        };
+        try {
+          await fetch(apiBase + '/api/avance-immediate/inscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(avancePayload)
+          });
+        } catch (_) {}
+      }
+
+      showStatus('success', avance
+        ? 'Demande envoyee ! Votre devis et votre inscription ont bien ete enregistres. Nous vous recontactons rapidement.'
+        : 'Votre demande a bien ete enregistree. Nous vous recontactons rapidement.'
+      );
+      form.reset();
+      if (avanceExtra) avanceExtra.style.display = 'none';
+    } catch (err) {
+      showStatus('error', 'Connexion au serveur impossible. Reessayez dans quelques instants.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Envoyer ma demande';
+    }
+  });
+})();
   </script>
 
 </body>
