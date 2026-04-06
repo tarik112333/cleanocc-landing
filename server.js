@@ -185,7 +185,7 @@ app.post('/api/devis', async (req, res) => {
 
     if (resend && process.env.NOTIFY_EMAIL) {
       resend.emails.send({
-        from: 'CleanOcc <noreply@cleanocc.fr>',
+        from: 'CleanOcc <onboarding@resend.dev>',
         to: process.env.NOTIFY_EMAIL,
         subject: `Nouvelle demande de devis – ${String(name).trim()}`,
         html: `
@@ -345,7 +345,7 @@ app.post('/api/avance-immediate/paiement', async (req, res) => {
 
   if (resend && process.env.NOTIFY_EMAIL) {
     resend.emails.send({
-      from: 'CleanOcc <noreply@cleanocc.fr>',
+      from: 'CleanOcc <onboarding@resend.dev>',
       to: process.env.NOTIFY_EMAIL,
       subject: `Avance Immédiate – ${String(prenom).trim()} ${String(nom).trim()}`,
       html: `
