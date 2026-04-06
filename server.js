@@ -131,9 +131,13 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'cleanocc-api' });
 });
 
-// --- FICHIERS STATIQUES (app.js, etc.) ---
+// --- FICHIERS STATIQUES (app.js, sitemap.xml, etc.) ---
 app.get('/app.js', (req, res) => {
   res.type('js').sendFile(path.join(__dirname, 'app.js'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml').sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
 // --- ROUTE HTML ---
