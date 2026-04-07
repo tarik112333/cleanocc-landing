@@ -141,11 +141,49 @@ app.get('/sitemap.xml', (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://cleanocc.fr/</loc>
-    <lastmod>2026-04-06</lastmod>
+    <lastmod>2026-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://cleanocc.fr/nettoyage-fin-de-location-toulouse</loc>
+    <lastmod>2026-04-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cleanocc.fr/lavage-vitres-toulouse</loc>
+    <lastmod>2026-04-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cleanocc.fr/nettoyage-bureaux-toulouse</loc>
+    <lastmod>2026-04-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cleanocc.fr/nettoyage-fin-de-chantier-toulouse</loc>
+    <lastmod>2026-04-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>`);
+});
+
+// --- PAGES SERVICE ---
+const servicePages = [
+  'nettoyage-fin-de-location-toulouse',
+  'lavage-vitres-toulouse',
+  'nettoyage-bureaux-toulouse',
+  'nettoyage-fin-de-chantier-toulouse',
+];
+
+servicePages.forEach((slug) => {
+  app.get(`/${slug}`, (req, res) => {
+    res.type('html').sendFile(path.join(__dirname, 'pages', `${slug}.html`));
+  });
 });
 
 // --- ROUTE HTML ---
