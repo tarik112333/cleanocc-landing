@@ -169,6 +169,12 @@ app.get('/sitemap.xml', (req, res) => {
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
+  <url>
+    <loc>https://cleanocc.fr/nettoyage-locations-courte-duree-toulouse</loc>
+    <lastmod>2026-04-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>`);
 });
 
@@ -178,6 +184,7 @@ const servicePages = [
   'lavage-vitres-toulouse',
   'nettoyage-bureaux-toulouse',
   'nettoyage-fin-de-chantier-toulouse',
+  'nettoyage-locations-courte-duree-toulouse',
 ];
 
 servicePages.forEach((slug) => {
