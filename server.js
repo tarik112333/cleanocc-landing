@@ -7,11 +7,16 @@ const { Resend } = require('resend');
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// --- STRIPE ---
+const Stripe = require('stripe');
+const stripe = process.env.STRIPE_SECRET_KEY ? Stripe(process.env.STRIPE_SECRET_KEY) : null;
+
 // --- AIRTABLE ---
 const AIRTABLE_KEY = process.env.AIRTABLE_KEY;
 const AIRTABLE_BASE = process.env.AIRTABLE_BASE;
 const AIRTABLE_TABLE_DEVIS = process.env.AIRTABLE_TABLE_DEVIS;
 const AIRTABLE_TABLE_AVANCE = process.env.AIRTABLE_TABLE_AVANCE;
+const AIRTABLE_TABLE_RESERVATIONS = process.env.AIRTABLE_TABLE_RESERVATIONS;
 
 function airtableDevisConfigured() {
   return Boolean(AIRTABLE_KEY && AIRTABLE_BASE && AIRTABLE_TABLE_DEVIS);
@@ -441,6 +446,199 @@ app.get('/api/devis', async (req, res) => {
     res.json(records.map(r => ({ id: r.id, ...r.fields })));
   } catch (err) {
     res.status(500).json({ error: 'Erreur Airtable.', detail: err.message });
+  }
+});
+
+// --- STRIPE : Tarification ---
+function calculerPrixReservation(service, surface) {
+  const grille = {
+    'lcd':          [60,  80,  100, 130, 160],
+    'fin-location': [80,  110, 140, 175, 220],
+    'bureaux':      [70,  90,  110, 140, 175],
+    'fin-chantier': [100, 130, 165, 210, 260],
+  };
+  const tarifs = grille[service];
+  if (!tarifs) return null;
+  const s = Number(surface);
+  if (isNaN(s) || s <= 0) return null;
+  if (s <= 35)  return tarifs[0];
+  if (s <= 55)  return tarifs[1];
+  if (s <= 75)  return tarifs[2];
+  if (s <= 100) return tarifs[3];
+  return tarifs[4];
+}
+
+const SERVICE_LABELS = {
+  'lcd':          'Nettoyage locations courte durée',
+  'fin-location': 'Nettoyage fin de location',
+  'bureaux':      'Nettoyage bureaux',
+  'fin-chantier': 'Nettoyage fin de chantier',
+};
+
+// --- STRIPE : Routes pages ---
+app.get('/reservation', (req, res) => {
+  const filePath = path.join(__dirname, 'pages', 'reservation.html');
+  let html = fs.readFileSync(filePath, 'utf8');
+  const pubKey = process.env.STRIPE_PUBLISHABLE_KEY || '';
+  html = html.replace('__STRIPE_PUBLISHABLE_KEY__', pubKey);
+  res.type('html').send(html);
+});
+
+app.get('/admin', (req, res) => {
+  res.type('html').sendFile(path.join(__dirname, 'pages', 'admin.html'));
+});
+
+// --- STRIPE : POST /api/reservation/create-intent ---
+app.post('/api/reservation/create-intent', async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Stripe non configuré.' });
+
+  const { service, surface, date, heure, prenom, nom, email, telephone, adresse } = req.body || {};
+
+  if (!service || !surface || !date || !heure || !prenom || !nom || !email || !telephone || !adresse) {
+    return res.status(400).json({ error: 'Tous les champs sont obligatoires.' });
+  }
+
+  const montant = calculerPrixReservation(service, surface);
+  if (!montant) return res.status(400).json({ error: 'Service ou surface invalide.' });
+
+  let airtableId = null;
+  if (AIRTABLE_TABLE_RESERVATIONS && AIRTABLE_KEY && AIRTABLE_BASE) {
+    try {
+      const record = await airtableInsert(AIRTABLE_TABLE_RESERVATIONS, {
+        'Prénom': String(prenom).trim(),
+        'Nom': String(nom).trim(),
+        'Email': String(email).trim(),
+        'Téléphone': String(telephone).trim(),
+        'Service': SERVICE_LABELS[service] || service,
+        'Surface (m²)': Number(surface),
+        'Date': String(date).trim(),
+        'Heure': String(heure).trim(),
+        'Adresse': String(adresse).trim(),
+        'Montant (€)': montant,
+        'Statut': 'en_attente',
+        'Créé le': new Date().toISOString(),
+      });
+      airtableId = record.id;
+    } catch (err) {
+      console.warn('Airtable reservation insert warning:', err.message);
+    }
+  }
+
+  try {
+    const intent = await stripe.paymentIntents.create({
+      amount: montant * 100,
+      currency: 'eur',
+      capture_method: 'manual',
+      description: `CleanOcc – ${SERVICE_LABELS[service] || service} – ${String(prenom).trim()} ${String(nom).trim()}`,
+      metadata: {
+        service,
+        surface: String(surface),
+        date: String(date).trim(),
+        heure: String(heure).trim(),
+        prenom: String(prenom).trim(),
+        nom: String(nom).trim(),
+        email: String(email).trim(),
+        telephone: String(telephone).trim(),
+        adresse: String(adresse).trim(),
+        airtableId: airtableId || '',
+      },
+    });
+
+    if (airtableId) {
+      await airtableUpdate(AIRTABLE_TABLE_RESERVATIONS, airtableId, {
+        'PaymentIntentId': intent.id,
+        'Statut': 'autorisé',
+      }).catch(err => console.warn('Airtable update warning:', err.message));
+    }
+
+    res.json({ clientSecret: intent.client_secret, intentId: intent.id, montant });
+  } catch (err) {
+    console.error('Stripe error:', err.message);
+    res.status(500).json({ error: 'Erreur Stripe.', detail: err.message });
+  }
+});
+
+// --- STRIPE : GET /api/admin/reservations ---
+app.get('/api/admin/reservations', async (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
+    return res.status(401).json({ error: 'Non autorisé.' });
+  }
+
+  if (!stripe) return res.status(503).json({ error: 'Stripe non configuré.' });
+
+  try {
+    const intents = await stripe.paymentIntents.list({ limit: 100 });
+    const reservations = intents.data
+      .filter(pi => pi.description && pi.description.startsWith('CleanOcc'))
+      .map(pi => ({
+        id: pi.id,
+        statut: pi.status,
+        montant: pi.amount / 100,
+        description: pi.description,
+        metadata: pi.metadata,
+        created: pi.created,
+      }));
+    res.json(reservations);
+  } catch (err) {
+    res.status(500).json({ error: 'Erreur Stripe.', detail: err.message });
+  }
+});
+
+// --- STRIPE : POST /api/admin/reservations/:intentId/capture ---
+app.post('/api/admin/reservations/:intentId/capture', async (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
+    return res.status(401).json({ error: 'Non autorisé.' });
+  }
+
+  if (!stripe) return res.status(503).json({ error: 'Stripe non configuré.' });
+
+  try {
+    const intent = await stripe.paymentIntents.capture(req.params.intentId);
+    const airtableId = intent.metadata?.airtableId;
+    if (airtableId && AIRTABLE_TABLE_RESERVATIONS && AIRTABLE_KEY && AIRTABLE_BASE) {
+      await airtableUpdate(AIRTABLE_TABLE_RESERVATIONS, airtableId, { 'Statut': 'encaissé' })
+        .catch(err => console.warn('Airtable update warning:', err.message));
+    }
+    if (resend && intent.metadata?.email) {
+      resend.emails.send({
+        from: 'CleanOcc <noreply@cleanocc.fr>',
+        to: intent.metadata.email,
+        subject: 'CleanOcc – Paiement encaissé, merci !',
+        html: `<p>Bonjour ${intent.metadata.prenom || ''},</p><p>Le prestataire est arrivé et votre paiement de <strong>${intent.amount / 100} €</strong> a été encaissé. Merci pour votre confiance !</p><p>L'équipe CleanOcc</p>`,
+      }).catch(err => console.error('Resend error:', err));
+    }
+    res.json({ ok: true, status: intent.status });
+  } catch (err) {
+    console.error('Stripe capture error:', err.message);
+    res.status(500).json({ error: 'Erreur lors de la capture.', detail: err.message });
+  }
+});
+
+// --- STRIPE : POST /api/admin/reservations/:intentId/cancel ---
+app.post('/api/admin/reservations/:intentId/cancel', async (req, res) => {
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
+    return res.status(401).json({ error: 'Non autorisé.' });
+  }
+
+  if (!stripe) return res.status(503).json({ error: 'Stripe non configuré.' });
+
+  try {
+    const intent = await stripe.paymentIntents.cancel(req.params.intentId);
+    const airtableId = intent.metadata?.airtableId;
+    if (airtableId && AIRTABLE_TABLE_RESERVATIONS && AIRTABLE_KEY && AIRTABLE_BASE) {
+      await airtableUpdate(AIRTABLE_TABLE_RESERVATIONS, airtableId, { 'Statut': 'annulé' })
+        .catch(err => console.warn('Airtable update warning:', err.message));
+    }
+    res.json({ ok: true, status: intent.status });
+  } catch (err) {
+    console.error('Stripe cancel error:', err.message);
+    res.status(500).json({ error: 'Erreur lors de l\'annulation.', detail: err.message });
   }
 });
 

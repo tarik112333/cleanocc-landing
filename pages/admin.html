@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin – Réservations CleanOcc</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f7fafc;
+      color: #2d3748;
+      min-height: 100vh;
+    }
+    header {
+      background: #1a365d;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 1.3rem; font-weight: 700; }
+    .logo span { color: #fc8181; }
+    .admin-badge {
+      background: rgba(255,255,255,0.15);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    .container { max-width: 960px; margin: 2rem auto; padding: 0 1rem 4rem; }
+
+    /* Auth */
+    #auth-panel {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 2.5rem;
+      max-width: 400px;
+      margin: 3rem auto;
+      text-align: center;
+    }
+    #auth-panel h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #1a365d; }
+    #auth-panel input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    #auth-panel input:focus { outline: none; border-color: #4299e1; }
+    #auth-error { color: #e53e3e; font-size: 0.85rem; margin-top: -0.5rem; margin-bottom: 0.8rem; min-height: 1.2rem; }
+
+    /* Buttons */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active { transform: none; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-primary { background: #2b6cb0; color: #fff; }
+    .btn-success { background: #38a169; color: #fff; }
+    .btn-danger  { background: #e53e3e; color: #fff; }
+    .btn-ghost   { background: #edf2f7; color: #4a5568; }
+
+    /* Dashboard */
+    #dashboard { display: none; }
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    .dashboard-header h1 { font-size: 1.4rem; color: #1a365d; }
+    .stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      text-align: center;
+      min-width: 130px;
+    }
+    .stat-value { font-size: 1.6rem; font-weight: 800; color: #2b6cb0; }
+    .stat-label { font-size: 0.75rem; color: #718096; margin-top: 0.2rem; }
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 0.4rem 1rem;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 20px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #4a5568;
+      transition: all 0.15s;
+    }
+    .filter-btn.active { border-color: #2b6cb0; background: #ebf4ff; color: #2b6cb0; font-weight: 600; }
+
+    /* Reservation cards */
+    #reservations-list { display: flex; flex-direction: column; gap: 1rem; }
+    .resa-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      padding: 1.3rem 1.5rem;
+      border-left: 4px solid #cbd5e0;
+      transition: box-shadow 0.2s;
+    }
+    .resa-card:hover { box-shadow: 0 3px 16px rgba(0,0,0,0.11); }
+    .resa-card.status-requires_capture { border-left-color: #f6ad55; }
+    .resa-card.status-succeeded { border-left-color: #68d391; }
+    .resa-card.status-canceled { border-left-color: #fc8181; opacity: 0.7; }
+    .resa-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .resa-name { font-size: 1rem; font-weight: 700; }
+    .resa-amount { font-size: 1.1rem; font-weight: 800; color: #2b6cb0; }
+    .resa-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.4rem 1rem;
+      font-size: 0.83rem;
+      color: #4a5568;
+      margin-bottom: 1rem;
+    }
+    .resa-meta span { display: flex; gap: 0.3rem; align-items: center; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-pending  { background: #fef3c7; color: #92400e; }
+    .badge-capture  { background: #fef9c3; color: #854d0e; }
+    .badge-captured { background: #dcfce7; color: #166534; }
+    .badge-canceled { background: #fee2e2; color: #991b1b; }
+    .resa-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    #loading { text-align: center; padding: 2rem; color: #718096; font-size: 0.95rem; }
+    #empty { text-align: center; padding: 2rem; color: #a0aec0; display: none; }
+    .logout-btn {
+      padding: 0.4rem 0.9rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background 0.15s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.2); }
+    @media (max-width: 500px) {
+      .resa-meta { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Clean<span>Occ</span></div>
+  <div style="display:flex;align-items:center;gap:0.8rem;">
+    <span class="admin-badge">Administration</span>
+    <button class="logout-btn" id="logout-btn" style="display:none;">Déconnexion</button>
+  </div>
+</header>
+
+<!-- Auth panel -->
+<div id="auth-panel">
+  <h2>🔐 Accès administration</h2>
+  <input type="password" id="token-input" placeholder="Token administrateur" />
+  <div id="auth-error"></div>
+  <button class="btn btn-primary" id="login-btn" style="width:100%;">Connexion</button>
+</div>
+
+<!-- Dashboard -->
+<div class="container" id="dashboard">
+  <div class="dashboard-header">
+    <h1>Réservations</h1>
+    <button class="btn btn-ghost" id="refresh-btn">🔄 Actualiser</button>
+  </div>
+
+  <div class="stats" id="stats-row">
+    <div class="stat-card"><div class="stat-value" id="stat-total">—</div><div class="stat-label">Total</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-pending" style="color:#d69e2e;">—</div><div class="stat-label">En attente</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-captured" style="color:#38a169;">—</div><div class="stat-label">Encaissées</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-revenue" style="color:#2b6cb0;">—</div><div class="stat-label">CA encaissé (€)</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">Toutes</button>
+    <button class="filter-btn" data-filter="requires_capture">En attente</button>
+    <button class="filter-btn" data-filter="succeeded">Encaissées</button>
+    <button class="filter-btn" data-filter="canceled">Annulées</button>
+  </div>
+
+  <div id="loading">Chargement des réservations…</div>
+  <div id="reservations-list"></div>
+  <div id="empty">Aucune réservation pour ce filtre.</div>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'cleanocc_admin_token';
+  let adminToken = '';
+  let allReservations = [];
+  let activeFilter = 'all';
+
+  const authPanel = document.getElementById('auth-panel');
+  const dashboard = document.getElementById('dashboard');
+  const tokenInput = document.getElementById('token-input');
+  const loginBtn   = document.getElementById('login-btn');
+  const authError  = document.getElementById('auth-error');
+  const logoutBtn  = document.getElementById('logout-btn');
+
+  function statusLabel(status) {
+    switch (status) {
+      case 'requires_capture':      return { label: 'En attente',  cls: 'badge-capture' };
+      case 'succeeded':             return { label: 'Encaissé',    cls: 'badge-captured' };
+      case 'canceled':              return { label: 'Annulé',      cls: 'badge-canceled' };
+      case 'requires_payment_method': return { label: 'Paiement échoué', cls: 'badge-canceled' };
+      default:                      return { label: status,        cls: 'badge-pending' };
+    }
+  }
+
+  function formatDate(ts) {
+    return new Date(ts * 1000).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function updateStats(list) {
+    document.getElementById('stat-total').textContent = list.length;
+    const pending  = list.filter(r => r.statut === 'requires_capture').length;
+    const captured = list.filter(r => r.statut === 'succeeded');
+    const revenue  = captured.reduce((s, r) => s + r.montant, 0);
+    document.getElementById('stat-pending').textContent  = pending;
+    document.getElementById('stat-captured').textContent = captured.length;
+    document.getElementById('stat-revenue').textContent  = revenue.toFixed(0) + ' €';
+  }
+
+  function renderList(filter) {
+    activeFilter = filter;
+    const list = filter === 'all' ? allReservations : allReservations.filter(r => r.statut === filter);
+    const container = document.getElementById('reservations-list');
+    const empty = document.getElementById('empty');
+    document.getElementById('loading').style.display = 'none';
+
+    if (!list.length) {
+      container.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    container.innerHTML = list.map(r => {
+      const st = statusLabel(r.statut);
+      const m = r.metadata || {};
+      const svcLabel = {
+        'lcd': 'Locations courte durée',
+        'fin-location': 'Fin de location',
+        'bureaux': 'Bureaux',
+        'fin-chantier': 'Fin de chantier',
+      }[m.service] || m.service || '—';
+
+      const canCapture = r.statut === 'requires_capture';
+      const canCancel  = r.statut === 'requires_capture';
+
+      return `<div class="resa-card status-${r.statut}">
+        <div class="resa-header">
+          <div>
+            <div class="resa-name">${esc(m.prenom || '')} ${esc(m.nom || '')}</div>
+            <span class="badge ${st.cls}">${st.label}</span>
+          </div>
+          <div class="resa-amount">${r.montant} €</div>
+        </div>
+        <div class="resa-meta">
+          <span>🧹 ${esc(svcLabel)}</span>
+          <span>📐 ${esc(m.surface || '—')} m²</span>
+          <span>📅 ${esc(m.date || '—')} à ${esc(m.heure || '—')}</span>
+          <span>📍 ${esc(m.adresse || '—')}</span>
+          <span>📧 ${esc(m.email || '—')}</span>
+          <span>📞 ${esc(m.telephone || '—')}</span>
+          <span>🕐 Réservé le ${formatDate(r.created)}</span>
+          <span style="font-size:0.75rem;color:#a0aec0;">ID: ${r.id}</span>
+        </div>
+        <div class="resa-actions">
+          ${canCapture ? `<button class="btn btn-success" onclick="captureIntent('${r.id}', this)">✅ Je suis arrivé – Encaisser</button>` : ''}
+          ${canCancel  ? `<button class="btn btn-danger" onclick="cancelIntent('${r.id}', this)">❌ Annuler</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function loadReservations() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('reservations-list').innerHTML = '';
+    document.getElementById('empty').style.display = 'none';
+    try {
+      const resp = await fetch('/api/admin/reservations', {
+        headers: { 'Authorization': 'Bearer ' + adminToken },
+      });
+      if (resp.status === 401) { logout(); return; }
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || 'Erreur');
+      allReservations = data;
+      updateStats(data);
+      renderList(activeFilter);
+    } catch (err) {
+      document.getElementById('loading').textContent = 'Erreur : ' + err.message;
+    }
+  }
+
+  window.captureIntent = async function (intentId, btn) {
+    if (!confirm('Confirmer l\'encaissement du paiement ?')) return;
+    btn.disabled = true; btn.textContent = '⏳ En cours…';
+    try {
+      const resp = await fetch(`/api/admin/reservations/${intentId}/capture`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + adminToken },
+      });
+      const data = await resp.json();
+      if (data.ok) { await loadReservations(); }
+      else { alert('Erreur : ' + (data.error || 'inconnue')); btn.disabled = false; btn.textContent = '✅ Je suis arrivé – Encaisser'; }
+    } catch { btn.disabled = false; btn.textContent = '✅ Je suis arrivé – Encaisser'; }
+  };
+
+  window.cancelIntent = async function (intentId, btn) {
+    if (!confirm('Annuler cette réservation ? Le client ne sera pas débité.')) return;
+    btn.disabled = true; btn.textContent = '⏳ Annulation…';
+    try {
+      const resp = await fetch(`/api/admin/reservations/${intentId}/cancel`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + adminToken },
+      });
+      const data = await resp.json();
+      if (data.ok) { await loadReservations(); }
+      else { alert('Erreur : ' + (data.error || 'inconnue')); btn.disabled = false; btn.textContent = '❌ Annuler'; }
+    } catch { btn.disabled = false; btn.textContent = '❌ Annuler'; }
+  };
+
+  function login(token) {
+    adminToken = token;
+    localStorage.setItem(STORAGE_KEY, token);
+    authPanel.style.display = 'none';
+    dashboard.style.display = 'block';
+    logoutBtn.style.display = 'inline';
+    loadReservations();
+  }
+
+  function logout() {
+    adminToken = '';
+    localStorage.removeItem(STORAGE_KEY);
+    authPanel.style.display = 'block';
+    dashboard.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    tokenInput.value = '';
+  }
+
+  loginBtn.addEventListener('click', async () => {
+    const token = tokenInput.value.trim();
+    if (!token) { authError.textContent = 'Veuillez entrer le token.'; return; }
+    loginBtn.disabled = true; loginBtn.textContent = 'Vérification…';
+    const resp = await fetch('/api/admin/reservations', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    loginBtn.disabled = false; loginBtn.textContent = 'Connexion';
+    if (resp.status === 401) { authError.textContent = 'Token incorrect.'; return; }
+    authError.textContent = '';
+    login(token);
+  });
+
+  tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+  logoutBtn.addEventListener('click', logout);
+  document.getElementById('refresh-btn').addEventListener('click', loadReservations);
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderList(btn.dataset.filter);
+    });
+  });
+
+  // Auto-login if token stored
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) login(saved);
+})();
+</script>
+</body>
+</html>
