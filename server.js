@@ -453,9 +453,9 @@ app.get('/api/devis', async (req, res) => {
 function calculerPrixReservation(service, surface) {
   const grille = {
     'lcd':          [60,  80,  100, 130, 160],
-    'fin-location': [80,  110, 140, 175, 220],
+    'fin-location': [95,  130, 165, 200, 260],
     'bureaux':      [70,  90,  110, 140, 175],
-    'fin-chantier': [100, 130, 165, 210, 260],
+    'fin-chantier': [160, 210, 260, 330, 420],
   };
   const tarifs = grille[service];
   if (!tarifs) return null;
