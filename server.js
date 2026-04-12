@@ -484,7 +484,7 @@ app.get('/reservation', (req, res) => {
   res.type('html').send(html);
 });
 
-app.get('/admin', (req, res) => {
+app.get('/gestion-cc9x4k', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, 'pages', 'admin.html'));
 });
 
