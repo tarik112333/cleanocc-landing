@@ -191,13 +191,44 @@
     @media (max-width: 500px) {
       .field-group { grid-template-columns: 1fr; }
       .price-amount { font-size: 1.6rem; }
+      header { padding: 0.75rem 1rem; }
+      .header-subtitle { display: none; }
+      .container { margin: 1rem auto; padding: 0 0.75rem 6rem; }
+      h1 { font-size: 1.3rem; }
+      .card { padding: 1.2rem 1rem; }
+      .time-btn { padding: 0.9rem 0.5rem; font-size: 1rem; min-height: 48px; }
+      .time-grid { gap: 0.4rem; }
+      select, input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"] {
+        font-size: 1rem;
+        padding: 0.75rem 0.85rem;
+        min-height: 48px;
+      }
+      /* Sticky pay button */
+      .sticky-pay-wrap {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border-top: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+        z-index: 100;
+        box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+      }
+      .btn-pay { margin-top: 0; padding: 1rem; font-size: 1.05rem; }
+      .guarantee { font-size: 0.72rem; }
+      /* Hide inline pay button area on mobile (replaced by sticky) */
+      .inline-pay { display: none; }
+    }
+    @media (min-width: 501px) {
+      .sticky-pay-wrap { display: none; }
     }
   </style>
 </head>
 <body>
 <header>
   <a href="/" class="logo">Clean<span>Occ</span></a>
-  <span style="color:#718096;font-size:0.9rem;">— Réservation en ligne</span>
+  <span class="header-subtitle" style="color:#718096;font-size:0.9rem;">— Réservation en ligne</span>
 </header>
 
 <div class="container">
@@ -224,7 +255,7 @@
         </div>
         <div>
           <label for="surface">Surface (m²) *</label>
-          <input type="number" id="surface" name="surface" min="10" max="500" placeholder="ex. 60" required />
+          <input type="number" id="surface" name="surface" min="10" max="500" placeholder="ex. 60" inputmode="numeric" required />
         </div>
       </div>
       <div class="price-display" id="price-display" style="display:none;">
@@ -297,12 +328,22 @@
       <label for="card-element">Carte bancaire *</label>
       <div id="card-element"></div>
       <div id="card-errors"></div>
-      <button type="submit" class="btn-pay" id="btn-pay">
-        <span id="btn-text">🔒 Autoriser le paiement</span>
-      </button>
-      <div class="guarantee">🔐 Paiement chiffré SSL via Stripe — vos données bancaires ne transitent jamais par nos serveurs</div>
+      <div class="inline-pay">
+        <button type="submit" class="btn-pay" id="btn-pay-inline">
+          <span>🔒 Autoriser le paiement</span>
+        </button>
+        <div class="guarantee">🔐 Paiement chiffré SSL via Stripe — vos données bancaires ne transitent jamais par nos serveurs</div>
+      </div>
     </div>
   </form>
+
+  <!-- Sticky pay button (mobile only) -->
+  <div class="sticky-pay-wrap">
+    <button type="submit" form="reservation-form" class="btn-pay" id="btn-pay">
+      <span id="btn-text">🔒 Autoriser le paiement</span>
+    </button>
+    <div class="guarantee">🔐 SSL via Stripe — vos données ne transitent pas par nos serveurs</div>
+  </div>
 
   <div class="success-box" id="success-box">
     <div class="check">✅</div>
@@ -378,15 +419,27 @@
     });
   });
 
+  // Buttons (sticky mobile + inline desktop)
+  const btnPay = document.getElementById('btn-pay');
+  const btnPayInline = document.getElementById('btn-pay-inline');
+  const btnText = document.getElementById('btn-text');
+  const LABEL_DEFAULT = '🔒 Autoriser le paiement';
+  const LABEL_LOADING = '⏳ Traitement en cours…';
+
+  function setLoading(loading) {
+    if (btnPay) { btnPay.disabled = loading; btnText.textContent = loading ? LABEL_LOADING : LABEL_DEFAULT; }
+    if (btnPayInline) {
+      btnPayInline.disabled = loading;
+      btnPayInline.querySelector('span').textContent = loading ? LABEL_LOADING : LABEL_DEFAULT;
+    }
+  }
+
   // Submit
   document.getElementById('reservation-form').addEventListener('submit', async function (e) {
     e.preventDefault();
     if (!selectedTime) { alert('Veuillez sélectionner un créneau horaire.'); return; }
 
-    const btnPay = document.getElementById('btn-pay');
-    const btnText = document.getElementById('btn-text');
-    btnPay.disabled = true;
-    btnText.textContent = '⏳ Traitement en cours…';
+    setLoading(true);
 
     const body = {
       service: document.getElementById('service').value,
@@ -409,7 +462,7 @@
       const data = await resp.json();
       if (!resp.ok || !data.clientSecret) {
         document.getElementById('card-errors').textContent = data.error || 'Erreur serveur.';
-        btnPay.disabled = false; btnText.textContent = '🔒 Autoriser le paiement';
+        setLoading(false);
         return;
       }
 
@@ -419,16 +472,16 @@
 
       if (error) {
         document.getElementById('card-errors').textContent = error.message;
-        btnPay.disabled = false; btnText.textContent = '🔒 Autoriser le paiement';
+        setLoading(false);
       } else {
         document.getElementById('reservation-form').style.display = 'none';
-        const successBox = document.getElementById('success-box');
+        if (btnPay) btnPay.closest('.sticky-pay-wrap').style.display = 'none';
         document.getElementById('success-amount').textContent = data.montant + ' €';
-        successBox.style.display = 'block';
+        document.getElementById('success-box').style.display = 'block';
       }
     } catch (err) {
       document.getElementById('card-errors').textContent = 'Erreur réseau. Veuillez réessayer.';
-      btnPay.disabled = false; btnText.textContent = '🔒 Autoriser le paiement';
+      setLoading(false);
     }
   });
 })();
