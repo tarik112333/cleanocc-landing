@@ -188,6 +188,72 @@
       font-weight: 600;
     }
     .time-btn:hover:not(.selected) { border-color: #a0aec0; }
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .faq-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .faq-item summary {
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #2d3748;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+    }
+    .faq-item summary::after { content: '+'; font-size: 1.2rem; color: #4299e1; font-weight: 700; }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item p {
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      color: #4a5568;
+      line-height: 1.6;
+      border-top: 1px solid #e2e8f0;
+      margin: 0;
+    }
+    /* Card logos */
+    .card-logos {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .card-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      height: 26px;
+    }
+    .card-logo.visa { color: #1a1f71; letter-spacing: 0.05em; background: #fff; }
+    .card-logo.mastercard { background: #fff; gap: 0; padding: 0.25rem 0.4rem; }
+    .mc-left { width: 16px; height: 16px; border-radius: 50%; background: #EB001B; display: inline-block; }
+    .mc-right { width: 16px; height: 16px; border-radius: 50%; background: #F79E1B; display: inline-block; margin-left: -7px; }
+    .card-logo.cb { color: #003189; background: #fff; font-family: serif; }
+    .stripe-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 0.2rem 0.5rem;
+      background: #fff;
+      height: 26px;
+    }
+    .stripe-badge span { font-size: 0.7rem; color: #635BFF; font-weight: 700; }
+
     @media (max-width: 500px) {
       .field-group { grid-template-columns: 1fr; }
       .price-amount { font-size: 1.6rem; }
@@ -322,10 +388,45 @@
       </div>
     </div>
 
+    <!-- FAQ -->
+    <div class="card">
+      <h2>Questions fréquentes</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Quand suis-je débité ?</summary>
+          <p>Votre carte est uniquement <strong>préautorisée</strong> lors de la réservation — aucun débit immédiat. Le paiement est encaissé uniquement au moment où le prestataire clique sur "Je suis arrivé" sur place.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Puis-je annuler ma réservation ?</summary>
+          <p>Oui, <strong>sans frais</strong>, tant que le prestataire n'est pas encore arrivé. Contactez-nous par téléphone ou WhatsApp au 07 68 14 05 60 pour annuler.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Mes données bancaires sont-elles sécurisées ?</summary>
+          <p>Absolument. Vos coordonnées bancaires sont <strong>chiffrées par Stripe</strong> (certifié PCI-DSS niveau 1). CleanOcc ne voit jamais vos données de carte.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Et si je ne suis pas satisfait ?</summary>
+          <p>Contactez-nous dans les <strong>24h</strong> suivant la prestation — nous trouverons une solution adaptée (retour sur place ou geste commercial).</p>
+        </details>
+      </div>
+    </div>
+
     <!-- Paiement -->
     <div class="card">
       <h2>Paiement sécurisé</h2>
-      <label for="card-element">Carte bancaire *</label>
+      <!-- Logos cartes -->
+      <div class="card-logos">
+        <span class="card-logo visa">VISA</span>
+        <span class="card-logo mastercard"><span class="mc-left"></span><span class="mc-right"></span></span>
+        <span class="card-logo cb">CB</span>
+        <span class="stripe-badge">
+          <svg viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg" width="48" height="20">
+            <path d="M59.64 14.28h-8.06v-1.37c0-.56.4-.87 1.04-.87.93 0 2.1.28 3.03.78V9.5a8.1 8.1 0 0 0-3.03-.56c-2.48 0-4.13 1.3-4.13 3.46v.15h-1.68v3.1h1.68v8.43h3.1v-8.43h2.87l.43-3.1h-3.3v-.06c0-.56.4-.84 1.04-.84.93 0 2.1.28 3.03.78V9.5a8.1 8.1 0 0 0-3.03-.56" fill="#635BFF"/>
+          </svg>
+          <span>Powered by Stripe</span>
+        </span>
+      </div>
+      <label for="card-element" style="margin-top:0.8rem;display:block;">Numéro de carte *</label>
       <div id="card-element"></div>
       <div id="card-errors"></div>
       <div class="inline-pay">
