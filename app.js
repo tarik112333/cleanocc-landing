@@ -197,6 +197,9 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
         } catch (_) {}
       }
 
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead');
+      }
       showStatus('success', avance
         ? 'Demande envoyee ! Votre devis et votre inscription ont bien ete enregistres. Nous vous recontactons rapidement.'
         : 'Votre demande a bien ete enregistree. Nous vous recontactons rapidement.'
