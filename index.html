@@ -1902,9 +1902,13 @@
                   <div>
                     <label for="ai-civilite">Civilité *</label>
                     <select id="ai-civilite" name="civilite">
-                      <option value="M">M.</option>
-                      <option value="MME">Mme</option>
+                      <option value="1">M.</option>
+                      <option value="2">Mme</option>
                     </select>
+                  </div>
+                  <div>
+                    <label for="ai-nomNaissance">Nom de naissance *</label>
+                    <input type="text" id="ai-nomNaissance" name="nomNaissance" placeholder="ex : Dupont" />
                   </div>
                   <div>
                     <label for="ai-dateNaissance">Date de naissance *</label>
@@ -1913,10 +1917,6 @@
                   <div>
                     <label for="ai-communeNaissance">Commune de naissance *</label>
                     <input type="text" id="ai-communeNaissance" name="communeNaissance" placeholder="ex : Toulouse" />
-                  </div>
-                  <div>
-                    <label for="ai-paysNaissance">Pays de naissance *</label>
-                    <input type="text" id="ai-paysNaissance" name="paysNaissance" placeholder="ex : France" value="France" />
                   </div>
                   <div style="grid-column:1/-1">
                     <label for="adresse">Adresse fiscale *</label>
@@ -1929,6 +1929,10 @@
                   <div>
                     <label for="ai-iban">IBAN *</label>
                     <input type="text" id="ai-iban" name="iban" placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" />
+                  </div>
+                  <div>
+                    <label for="ai-bic">BIC *</label>
+                    <input type="text" id="ai-bic" name="bic" placeholder="ex : BNPAFRPPXXX" />
                   </div>
                 </div>
                 <p style="font-size:0.75rem;color:#94a3b8;margin-top:10px;">🔒 Ces informations sont transmises uniquement à l’URSSAF pour activer votre avance immédiate. Non conservées au-delà.</p>
@@ -2292,18 +2296,19 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
 
       if (avance) {
         var avancePayload = {
-          civilite: (fd.get('civilite') || 'M').trim(),
-          prenom: prenom,
+          civilite: (fd.get('civilite') || '1').trim(),
           nom: nom,
-          email: devisPayload.email,
-          telephone: devisPayload.phone,
+          nomNaissance: (fd.get('nomNaissance') || nom).trim(),
+          prenoms: prenom,
           dateNaissance: (fd.get('dateNaissance') || '').trim(),
           communeNaissance: (fd.get('communeNaissance') || '').trim(),
-          paysNaissance: (fd.get('paysNaissance') || 'France').trim(),
+          email: devisPayload.email,
+          telephone: devisPayload.phone,
           adresse: (fd.get('adresse') || '').trim(),
           codePostal: (fd.get('codePostal') || '').trim(),
           ville: devisPayload.city,
-          iban: (fd.get('iban') || '').trim()
+          iban: (fd.get('iban') || '').replace(/\s/g, '').toUpperCase(),
+          bic: (fd.get('bic') || '').replace(/\s/g, '').toUpperCase()
         };
         try {
           await fetch(apiBase + '/api/avance-immediate/inscription', {
