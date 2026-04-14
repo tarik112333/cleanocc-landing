@@ -455,6 +455,15 @@ app.get('/mentions-legales', (req, res) => {
 app.get('/devis', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'devis.html'));
 });
+app.get('/nettoyage-blagnac', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-blagnac.html'));
+});
+app.get('/nettoyage-colomiers', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-colomiers.html'));
+});
+app.get('/nettoyage-balma', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-balma.html'));
+});
 
 app.get('/gestion-cc9x4k', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, 'pages', 'admin.html'));
