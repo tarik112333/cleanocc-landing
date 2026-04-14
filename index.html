@@ -1646,6 +1646,14 @@
       .nav-phone {
         display: none;
       }
+
+      #hero-call-mobile {
+        display: flex;
+      }
+
+      #whatsapp-float {
+        display: flex;
+      }
     }
   </style>
 </head>
@@ -1705,9 +1713,6 @@
         <a href="tel:+33768140560"
            style="display:none;align-items:center;justify-content:center;gap:8px;background:#0f172a;color:#fff;padding:14px 22px;border-radius:999px;font-weight:700;font-size:1rem;margin-top:10px;width:100%;text-align:center"
            id="hero-call-mobile">📞 Appeler maintenant – 07 68 14 05 60</a>
-        <style>
-@media(max-width:640px){#hero-call-mobile{display:flex}}
-        </style>
         <p class="hero-note">Réponse rapide (souvent dans la journée) – intervention à Toulouse et jusqu’à 15–20 km.</p>
       </div>
       <aside class="hero-card" aria-label="Résumé des avantages CleanOcc">
@@ -2366,9 +2371,7 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
    id="whatsapp-float">
   💬 WhatsApp
 </a>
-<style>
-@media(max-width:640px){#whatsapp-float{display:flex}}
-</style>
+
 </body>
 
 </html>
