@@ -186,50 +186,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // --- FICHIERS STATIQUES (app.js, sitemap.xml, etc.) ---
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
 app.get('/app.js', (req, res) => {
   res.type('js').sendFile(path.join(__dirname, 'app.js'));
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://cleanocc.fr/</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-fin-de-location-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/lavage-vitres-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-bureaux-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-fin-de-chantier-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-locations-courte-duree-toulouse</loc>
-    <lastmod>2026-04-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-</urlset>`);
+  res.type('application/xml').sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
 // --- PAGES SERVICE ---
@@ -294,23 +258,51 @@ app.post('/api/devis', async (req, res) => {
 
     res.status(201).json({ ok: true, id: record.id });
 
-    if (resend && process.env.NOTIFY_EMAIL) {
-      resend.emails.send({
-        from: 'CleanOcc <noreply@cleanocc.fr>',
-        to: process.env.NOTIFY_EMAIL,
-        subject: `Nouvelle demande de devis – ${String(name).trim()}`,
-        html: `
-          <h2>Nouvelle demande de devis CleanOcc</h2>
-          <table>
-            <tr><td><strong>Nom</strong></td><td>${String(name).trim()}</td></tr>
-            <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
-            <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
-            <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
-            <tr><td><strong>Prestation</strong></td><td>${String(service).trim()}</td></tr>
-            <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
-          </table>
-        `
-      }).catch(err => console.error('Resend error:', err));
+    if (resend) {
+      const clientName = String(name).trim();
+      const clientService = String(service).trim();
+
+      // Notification interne
+      if (process.env.NOTIFY_EMAIL) {
+        resend.emails.send({
+          from: 'CleanOcc <noreply@cleanocc.fr>',
+          to: process.env.NOTIFY_EMAIL,
+          subject: `Nouvelle demande de devis – ${clientName}`,
+          html: `
+            <h2>Nouvelle demande de devis CleanOcc</h2>
+            <table>
+              <tr><td><strong>Nom</strong></td><td>${clientName}</td></tr>
+              <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
+              <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
+              <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
+              <tr><td><strong>Prestation</strong></td><td>${clientService}</td></tr>
+              <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
+            </table>
+          `
+        }).catch(err => console.error('Resend notify error:', err));
+      }
+
+      // Confirmation au client
+      if (email && String(email).trim()) {
+        resend.emails.send({
+          from: 'CleanOcc <noreply@cleanocc.fr>',
+          to: String(email).trim(),
+          subject: 'Votre demande de devis CleanOcc a bien été reçue',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a">
+              <h2 style="color:#2563eb">Bonjour ${clientName},</h2>
+              <p>Nous avons bien reçu votre demande de devis pour <strong>${clientService}</strong>.</p>
+              <p>Notre équipe vous répondra <strong>sous 2h en semaine</strong> par téléphone ou email.</p>
+              <p>En attendant, vous pouvez nous joindre directement :</p>
+              <ul style="margin:12px 0 20px">
+                <li>📞 <a href="tel:+33768140560">07 68 14 05 60</a></li>
+                <li>💬 <a href="https://wa.me/33768140560">WhatsApp</a></li>
+              </ul>
+              <p style="color:#64748b;font-size:.9rem">À bientôt,<br><strong>L'équipe CleanOcc</strong></p>
+            </div>
+          `
+        }).catch(err => console.error('Resend confirm error:', err));
+      }
     }
   } catch (err) {
     console.error('Airtable devis error:', err.message);
@@ -606,6 +598,23 @@ app.get('/reservation', (req, res) => {
   const pubKey = process.env.STRIPE_PUBLISHABLE_KEY || '';
   html = html.replace('__STRIPE_PUBLISHABLE_KEY__', pubKey);
   res.type('html').send(html);
+});
+
+app.get('/mentions-legales', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'mentions-legales.html'));
+});
+
+app.get('/devis', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'devis.html'));
+});
+app.get('/nettoyage-blagnac', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-blagnac.html'));
+});
+app.get('/nettoyage-colomiers', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-colomiers.html'));
+});
+app.get('/nettoyage-balma', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-balma.html'));
 });
 
 app.get('/gestion-cc9x4k', (req, res) => {
