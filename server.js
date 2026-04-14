@@ -180,8 +180,17 @@ app.set('trust proxy', true);
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: '100kb' }));
 
+// Redirection cleanocc.fr → www.cleanocc.fr (préserve le chemin)
+app.use((req, res, next) => {
+  const host = req.get(‘host’) || ‘’;
+  if (host === ‘cleanocc.fr’) {
+    return res.redirect(301, `https://www.cleanocc.fr${req.url}`);
+  }
+  next();
+});
+
 // Santé de l’API (test CORS / disponibilité depuis le navigateur)
-app.get('/api/health', (req, res) => {
+app.get(‘/api/health’, (req, res) => {
   res.json({ ok: true, service: 'cleanocc-api' });
 });
 
