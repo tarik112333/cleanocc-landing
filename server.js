@@ -609,7 +609,12 @@ const extraPages = [
 ];
 extraPages.forEach((slug) => {
   app.get(`/${slug}`, (req, res) => {
-    res.type('html').sendFile(path.join(__dirname, 'pages', `${slug}.html`));
+    try {
+      const html = fs.readFileSync(path.join(__dirname, 'pages', `${slug}.html`), 'utf8');
+      res.type('html').send(html);
+    } catch (e) {
+      res.status(404).send('Page introuvable');
+    }
   });
 });
 
