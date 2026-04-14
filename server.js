@@ -24,7 +24,7 @@ function airtableDevisConfigured() {
 
 if (!airtableDevisConfigured()) {
   console.warn(
-    '[CleanOcc] Airtable devis non configuré : définissez AIRTABLE_KEY, AIRTABLE_BASE et AIRTABLE_TABLE_DEVIS dans .env (ou les variables d’environnement sur Render / votre hébergeur).'
+    `[CleanOcc] Airtable devis non configuré : définissez AIRTABLE_KEY, AIRTABLE_BASE et AIRTABLE_TABLE_DEVIS dans .env (ou les variables d'environnement sur Render / votre hébergeur).`
   );
 }
 
@@ -180,17 +180,17 @@ app.set('trust proxy', true);
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: '100kb' }));
 
-// Redirection cleanocc.fr → www.cleanocc.fr (préserve le chemin)
-app.use((req, res, next) => {
-  const host = req.get(‘host’) || ‘’;
-  if (host === ‘cleanocc.fr’) {
-    return res.redirect(301, `https://www.cleanocc.fr${req.url}`);
+// Redirection cleanocc.fr -> www.cleanocc.fr (preserve le chemin)
+app.use(function(req, res, next) {
+  var host = req.get("host") || "";
+  if (host === "cleanocc.fr") {
+    return res.redirect(301, "https://www.cleanocc.fr" + req.url);
   }
   next();
 });
 
-// Santé de l’API (test CORS / disponibilité depuis le navigateur)
-app.get(‘/api/health’, (req, res) => {
+// Santé de l'API (test CORS / disponibilité depuis le navigateur)
+app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'cleanocc-api' });
 });
 
@@ -235,7 +235,7 @@ app.get('/', (req, res) => {
   const proto = isProduction ? 'https' : req.protocol;
   const origin = `${proto}://${host}`;
 
-  // Toujours forcer l’origine API sur l’hôte actuel (siné meta figée = formulaire vers Render, .env local ignoré).
+  // Toujours forcer l'origine API sur l'hôte actuel (siné meta figée = formulaire vers Render, .env local ignoré).
   html = html.replace(
     /<meta name="cleanocc-api-origin" content="[^"]*" \/>/,
     `<meta name="cleanocc-api-origin" content="${origin}" />`
@@ -255,7 +255,7 @@ app.post('/api/devis', async (req, res) => {
   if (!airtableDevisConfigured()) {
     console.error('POST /api/devis refusé : variables Airtable manquantes.');
     return res.status(503).json({
-      error: 'Service temporairement indisponible : la base de données des demandes n’est pas configurée sur le serveur.',
+      error: `Service temporairement indisponible : la base de données des demandes n'est pas configurée sur le serveur.`,
     });
   }
 
