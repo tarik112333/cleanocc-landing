@@ -452,6 +452,10 @@ app.get('/mentions-legales', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'mentions-legales.html'));
 });
 
+app.get('/devis', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'devis.html'));
+});
+
 app.get('/gestion-cc9x4k', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, 'pages', 'admin.html'));
 });
