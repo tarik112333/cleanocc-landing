@@ -745,6 +745,16 @@
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.7);
       background: #f8fafc;
+      color: inherit;
+      text-decoration: none;
+    }
+    a.zones-pill {
+      border-color: rgba(37, 99, 235, 0.4);
+      color: #2563eb;
+      font-weight: 500;
+    }
+    a.zones-pill:hover {
+      background: #eff6ff;
     }
 
     .zones-card {
@@ -1822,11 +1832,11 @@
           </p>
           <div class="zones-list" aria-label="Exemples de villes desservies">
             <div class="zones-pill">Toulouse</div>
-            <div class="zones-pill">Blagnac</div>
+            <a href="/nettoyage-blagnac" class="zones-pill">Blagnac</a>
             <div class="zones-pill">Castelginest</div>
-            <div class="zones-pill">Colomiers</div>
+            <a href="/nettoyage-colomiers" class="zones-pill">Colomiers</a>
             <div class="zones-pill">L’Union</div>
-            <div class="zones-pill">Balma</div>
+            <a href="/nettoyage-balma" class="zones-pill">Balma</a>
             <div class="zones-pill">Aucamville</div>
             <div class="zones-pill">Et alentours…</div>
           </div>
