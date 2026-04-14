@@ -142,45 +142,7 @@ app.get('/app.js', (req, res) => {
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://cleanocc.fr/</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-fin-de-location-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/lavage-vitres-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-bureaux-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-fin-de-chantier-toulouse</loc>
-    <lastmod>2026-04-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://cleanocc.fr/nettoyage-locations-courte-duree-toulouse</loc>
-    <lastmod>2026-04-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-</urlset>`);
+  res.type('application/xml').sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
 // --- PAGES SERVICE ---
