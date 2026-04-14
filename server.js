@@ -217,6 +217,9 @@ const servicePages = [
   'nettoyage-blagnac',
   'nettoyage-colomiers',
   'nettoyage-balma',
+  'nettoyage-aucamville',
+  'nettoyage-castelginest',
+  'nettoyage-l-union',
 ];
 
 servicePages.forEach((slug) => {
