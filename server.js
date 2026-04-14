@@ -446,6 +446,10 @@ app.get('/reservation', (req, res) => {
   res.type('html').send(html);
 });
 
+app.get('/mentions-legales', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'mentions-legales.html'));
+});
+
 app.get('/gestion-cc9x4k', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, 'pages', 'admin.html'));
 });
