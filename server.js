@@ -600,21 +600,17 @@ app.get('/reservation', (req, res) => {
   res.type('html').send(html);
 });
 
-app.get('/mentions-legales', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'mentions-legales.html'));
-});
-
-app.get('/devis', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'devis.html'));
-});
-app.get('/nettoyage-blagnac', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-blagnac.html'));
-});
-app.get('/nettoyage-colomiers', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-colomiers.html'));
-});
-app.get('/nettoyage-balma', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'nettoyage-balma.html'));
+const extraPages = [
+  'mentions-legales',
+  'devis',
+  'nettoyage-blagnac',
+  'nettoyage-colomiers',
+  'nettoyage-balma',
+];
+extraPages.forEach((slug) => {
+  app.get(`/${slug}`, (req, res) => {
+    res.type('html').sendFile(path.join(__dirname, 'pages', `${slug}.html`));
+  });
 });
 
 app.get('/gestion-cc9x4k', (req, res) => {
