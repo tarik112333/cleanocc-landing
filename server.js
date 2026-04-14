@@ -203,6 +203,11 @@ const servicePages = [
   'nettoyage-bureaux-toulouse',
   'nettoyage-fin-de-chantier-toulouse',
   'nettoyage-locations-courte-duree-toulouse',
+  'mentions-legales',
+  'devis',
+  'nettoyage-blagnac',
+  'nettoyage-colomiers',
+  'nettoyage-balma',
 ];
 
 servicePages.forEach((slug) => {
@@ -600,23 +605,6 @@ app.get('/reservation', (req, res) => {
   res.type('html').send(html);
 });
 
-const extraPages = [
-  'mentions-legales',
-  'devis',
-  'nettoyage-blagnac',
-  'nettoyage-colomiers',
-  'nettoyage-balma',
-];
-extraPages.forEach((slug) => {
-  app.get(`/${slug}`, (req, res) => {
-    try {
-      const html = fs.readFileSync(path.join(__dirname, 'pages', `${slug}.html`), 'utf8');
-      res.type('html').send(html);
-    } catch (e) {
-      res.status(404).send('Page introuvable');
-    }
-  });
-});
 
 app.get('/gestion-cc9x4k', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, 'pages', 'admin.html'));
