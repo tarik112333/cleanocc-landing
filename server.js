@@ -209,23 +209,51 @@ app.post('/api/devis', async (req, res) => {
 
     res.status(201).json({ ok: true, id: record.id });
 
-    if (resend && process.env.NOTIFY_EMAIL) {
-      resend.emails.send({
-        from: 'CleanOcc <noreply@cleanocc.fr>',
-        to: process.env.NOTIFY_EMAIL,
-        subject: `Nouvelle demande de devis – ${String(name).trim()}`,
-        html: `
-          <h2>Nouvelle demande de devis CleanOcc</h2>
-          <table>
-            <tr><td><strong>Nom</strong></td><td>${String(name).trim()}</td></tr>
-            <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
-            <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
-            <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
-            <tr><td><strong>Prestation</strong></td><td>${String(service).trim()}</td></tr>
-            <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
-          </table>
-        `
-      }).catch(err => console.error('Resend error:', err));
+    if (resend) {
+      const clientName = String(name).trim();
+      const clientService = String(service).trim();
+
+      // Notification interne
+      if (process.env.NOTIFY_EMAIL) {
+        resend.emails.send({
+          from: 'CleanOcc <noreply@cleanocc.fr>',
+          to: process.env.NOTIFY_EMAIL,
+          subject: `Nouvelle demande de devis – ${clientName}`,
+          html: `
+            <h2>Nouvelle demande de devis CleanOcc</h2>
+            <table>
+              <tr><td><strong>Nom</strong></td><td>${clientName}</td></tr>
+              <tr><td><strong>Email</strong></td><td>${email ? String(email).trim() : '—'}</td></tr>
+              <tr><td><strong>Téléphone</strong></td><td>${String(phone).trim()}</td></tr>
+              <tr><td><strong>Ville</strong></td><td>${String(city).trim()}</td></tr>
+              <tr><td><strong>Prestation</strong></td><td>${clientService}</td></tr>
+              <tr><td><strong>Message</strong></td><td>${String(message).trim()}</td></tr>
+            </table>
+          `
+        }).catch(err => console.error('Resend notify error:', err));
+      }
+
+      // Confirmation au client
+      if (email && String(email).trim()) {
+        resend.emails.send({
+          from: 'CleanOcc <noreply@cleanocc.fr>',
+          to: String(email).trim(),
+          subject: 'Votre demande de devis CleanOcc a bien été reçue',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a">
+              <h2 style="color:#2563eb">Bonjour ${clientName},</h2>
+              <p>Nous avons bien reçu votre demande de devis pour <strong>${clientService}</strong>.</p>
+              <p>Notre équipe vous répondra <strong>sous 2h en semaine</strong> par téléphone ou email.</p>
+              <p>En attendant, vous pouvez nous joindre directement :</p>
+              <ul style="margin:12px 0 20px">
+                <li>📞 <a href="tel:+33768140560">07 68 14 05 60</a></li>
+                <li>💬 <a href="https://wa.me/33768140560">WhatsApp</a></li>
+              </ul>
+              <p style="color:#64748b;font-size:.9rem">À bientôt,<br><strong>L'équipe CleanOcc</strong></p>
+            </div>
+          `
+        }).catch(err => console.error('Resend confirm error:', err));
+      }
     }
   } catch (err) {
     console.error('Airtable devis error:', err.message);
