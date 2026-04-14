@@ -137,6 +137,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // --- FICHIERS STATIQUES (app.js, sitemap.xml, etc.) ---
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
 app.get('/app.js', (req, res) => {
   res.type('js').sendFile(path.join(__dirname, 'app.js'));
 });

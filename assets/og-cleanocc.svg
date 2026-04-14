@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="scale(1200 630)">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="60%" stop-color="#f5f7fb"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="60" cy="60" r="36" fill="#2563eb"/>
+  <text x="60" y="68" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="22" fill="white">C</text>
+  <text x="110" y="72" font-family="Arial,sans-serif" font-weight="800" font-size="28" fill="#0f172a">CleanOcc</text>
+  <text x="600" y="260" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="68" fill="#020617">Entreprise de nettoyage</text>
+  <text x="600" y="340" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="56" fill="#2563eb">à Toulouse</text>
+  <text x="600" y="430" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" fill="#64748b">Lavage de vitres · Fin de location · Fin de chantier</text>
+  <text x="600" y="510" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" fill="#64748b">⭐ 4,6/5 · Devis gratuit · 07 68 14 05 60</text>
+</svg>
