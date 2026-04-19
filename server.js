@@ -457,6 +457,57 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
       'Réponse URSSAF': JSON.stringify(result.data).slice(0, 10000),
     });
 
+    // Email de confirmation au client + alerte interne
+    if (resend && ok) {
+      // Email au client
+      resend.emails.send({
+        from: 'CleanOcc <noreply@cleanocc.fr>',
+        to: String(email).trim(),
+        subject: 'Votre inscription à l\'Avance Immédiate — action requise',
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;">
+            <h2 style="color:#2563eb;">Inscription Avance Immédiate transmise à l'URSSAF ✅</h2>
+            <p>Bonjour ${String(prenoms).trim()},</p>
+            <p>Votre demande d'inscription à l'<strong>Avance Immédiate de crédit d'impôt</strong> via CleanOcc a bien été transmise à l'URSSAF.</p>
+            <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:16px;margin:20px 0;border-radius:8px;">
+              <h3 style="margin-top:0;color:#1d4ed8;">⚠️ Action requise sous 48h</h3>
+              <p style="margin:8px 0;">Vous allez recevoir dans les <strong>24 à 48 heures</strong> un email de la part de l'<strong>URSSAF</strong> (expéditeur en <code>@urssaf.fr</code>) contenant :</p>
+              <ul style="margin:8px 0 8px 20px;padding:0;">
+                <li>Un lien vers votre espace personnel <a href="https://particulier.urssaf.fr" style="color:#2563eb;">particulier.urssaf.fr</a></li>
+                <li>Une demande de <strong>validation du mandat bancaire</strong> (SEPA)</li>
+                <li>La confirmation d'adhésion au dispositif</li>
+              </ul>
+              <p style="margin:8px 0;"><strong>👉 Pensez à vérifier vos spams / courriers indésirables.</strong> Sans cette validation, l'avance immédiate ne pourra pas être activée et vous devrez régler 100% de la facture.</p>
+            </div>
+            <p>Une fois validée, vous ne paierez plus que <strong>50 % du montant</strong> de la prestation — l'État verse directement les 50 % restants à CleanOcc.</p>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
+            <p style="font-size:0.9rem;color:#64748b;">Une question ? Répondez simplement à cet email ou contactez-nous au <a href="tel:+33768140560" style="color:#2563eb;">07 68 14 05 60</a>.</p>
+            <p style="font-size:0.85rem;color:#94a3b8;">CleanOcc — Entreprise de nettoyage à Toulouse<br/>SIRET ${URSSAF.siret || ''}</p>
+          </div>
+        `,
+      }).catch((e) => console.error('Resend client email error:', e.message));
+
+      // Alerte interne
+      if (process.env.NOTIFY_EMAIL) {
+        resend.emails.send({
+          from: 'CleanOcc <noreply@cleanocc.fr>',
+          to: process.env.NOTIFY_EMAIL,
+          subject: `🆕 Inscription Avance Immédiate — ${String(prenoms).trim()} ${String(nom).trim()}`,
+          html: `
+            <h3>Nouvelle inscription URSSAF transmise avec succès</h3>
+            <table style="border-collapse:collapse;font-family:Arial;">
+              <tr><td><strong>Nom</strong></td><td>${String(prenoms).trim()} ${String(nom).trim()}</td></tr>
+              <tr><td><strong>Email</strong></td><td>${String(email).trim()}</td></tr>
+              <tr><td><strong>Téléphone</strong></td><td>${String(telephone).trim()}</td></tr>
+              <tr><td><strong>Adresse</strong></td><td>${String(adresse).trim()}, ${String(codePostal).trim()} ${String(ville).trim()}</td></tr>
+              <tr><td><strong>Airtable ID</strong></td><td>${recordId}</td></tr>
+            </table>
+            <p>Statut : <strong style="color:#16a34a;">urssaf_ok</strong> — le client doit maintenant valider le mandat bancaire dans son espace URSSAF.</p>
+          `,
+        }).catch((e) => console.error('Resend notify email error:', e.message));
+      }
+    }
+
     return res.status(ok ? 201 : result.status).json({ ok, id: recordId, urssaf: result.data });
   } catch (err) {
     console.error('URSSAF inscription error:', err.message);
