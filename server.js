@@ -214,6 +214,7 @@ const servicePages = [
   'nettoyage-locations-courte-duree-toulouse',
   'mentions-legales',
   'devis',
+  'offre',
   'nettoyage-blagnac',
   'nettoyage-colomiers',
   'nettoyage-balma',
