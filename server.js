@@ -382,6 +382,8 @@ app.post('/api/avance-immediate/inscription', async (req, res) => {
       'Adresse': String(adresse).trim(),
       'Ville': String(ville).trim(),
       'Code Postal': String(codePostal).trim(),
+      'IBAN': String(iban).replace(/\s/g, '').toUpperCase(),
+      'BIC': String(bic).replace(/\s/g, '').toUpperCase(),
       'Statut': 'en_attente',
       'Date': new Date().toISOString(),
     });
