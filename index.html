@@ -2285,6 +2285,9 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
       avanceExtra.querySelectorAll('input').forEach(function (inp) {
         inp.required = toggle.checked;
       });
+      // L'URSSAF exige un email pour l'inscription (envoi du lien d'activation)
+      var emailInput = document.getElementById('email');
+      if (emailInput) emailInput.required = toggle.checked;
     });
   }
 
@@ -2301,6 +2304,29 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
   function hideStatus() {
     statusEl.className = 'form-status form-full';
     statusEl.textContent = '';
+  }
+
+  var devisEnvoye = false;
+
+  // Traduit la réponse d'erreur de /api/avance-immediate/inscription en texte lisible
+  function messageErreurAvance(d) {
+    var libelles = {
+      civilite: 'civilité', nom: 'nom', nomNaissance: 'nom de naissance', prenoms: 'prénom',
+      dateNaissance: 'date de naissance', communeNaissance: 'commune de naissance', email: 'email',
+      telephone: 'téléphone', adresse: 'adresse', codePostal: 'code postal', ville: 'ville',
+      iban: 'IBAN', bic: 'BIC'
+    };
+    if (!d) return 'erreur inconnue';
+    if (d.missing && d.missing.length) {
+      return 'champs manquants : ' + d.missing.map(function (k) { return libelles[k] || k; }).join(', ');
+    }
+    if (d.detail) return d.detail;
+    if (d.urssaf) {
+      var u = Array.isArray(d.urssaf) ? d.urssaf : [d.urssaf];
+      var msgs = u.map(function (e) { return e && (e.description || e.message || e.code); }).filter(Boolean);
+      return 'refus URSSAF : ' + (msgs.length ? msgs.join(' ; ') : JSON.stringify(d.urssaf).slice(0, 200));
+    }
+    return d.error || 'erreur inconnue';
   }
 
   form.addEventListener('submit', async function (e) {
@@ -2325,6 +2351,10 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
       showStatus('error', 'Merci de remplir tous les champs obligatoires.');
       return;
     }
+    if (avance && !devisPayload.email) {
+      showStatus('error', 'L’email est obligatoire pour l’avance immédiate : l’URSSAF vous y envoie le lien d’activation.');
+      return;
+    }
 
     btn.disabled = true;
     btn.textContent = 'Envoi en cours...';
@@ -2336,7 +2366,9 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
     try {
       var res = null, data = {};
       var lastNetErr = null;
-      for (var i = 0; i < urls.length; i++) {
+      // Si le devis est déjà parti (seule l'inscription avance avait échoué), on ne le renvoie pas
+      if (devisEnvoye) { res = { ok: true, status: 200 }; data = { ok: true }; }
+      for (var i = 0; !devisEnvoye && i < urls.length; i++) {
         try {
           var attempt = await fetch(urls[i], {
             method: 'POST',
@@ -2372,6 +2404,7 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
         showStatus('error', hint);
         return;
       }
+      devisEnvoye = true;
 
       if (avance) {
         var avancePayload = {
@@ -2389,13 +2422,25 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
           iban: (fd.get('iban') || '').replace(/\s/g, '').toUpperCase(),
           bic: (fd.get('bic') || '').replace(/\s/g, '').toUpperCase()
         };
+        var avanceErreur = null;
         try {
-          await fetch(apiBase + '/api/avance-immediate/inscription', {
+          var avRes = await fetch(apiBase + '/api/avance-immediate/inscription', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify(avancePayload)
           });
-        } catch (_) {}
+          var avData = await avRes.json().catch(function () { return {}; });
+          if (!avRes.ok || !avData || avData.ok !== true) {
+            avanceErreur = messageErreurAvance(avData);
+          }
+        } catch (_) {
+          avanceErreur = 'serveur injoignable, réessayez dans 1 minute';
+        }
+        if (avanceErreur) {
+          // On garde le formulaire rempli pour que le client corrige et renvoie
+          showStatus('error', 'Votre demande de devis est bien enregistrée, mais l’inscription à l’avance immédiate n’a pas abouti (' + avanceErreur + '). Corrigez puis cliquez à nouveau sur Envoyer, ou appelez-nous au 07 68 14 05 60.');
+          return;
+        }
       }
 
       showStatus('success', avance
@@ -2403,6 +2448,7 @@ document.querySelectorAll('.faq-q').forEach(function (q) {
         : 'Votre demande a bien ete enregistree. Nous vous recontactons rapidement.'
       );
       form.reset();
+      devisEnvoye = false;
       if (avanceExtra) avanceExtra.style.display = 'none';
     } catch (err) {
       showStatus('error', 'Connexion au serveur impossible. Reessayez dans quelques instants.');
